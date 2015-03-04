@@ -41,9 +41,7 @@ public class NetworkThread extends Thread{
 	 * @param data The current data list.
 	 */
 	public void copyFromQueue(LinkedList<Double> data){
-		for (Double d : databuffer){
-			data.addLast(d.doubleValue());
-		}
+		databuffer.drainTo(data); //Moves all data from the buffer to the core data list.
 	}
 	
 	//Returns a fake double data point. Will be deleted at a later point.
