@@ -6,17 +6,20 @@ import java.util.concurrent.LinkedBlockingDeque;
 
 public class NetworkThread extends Thread{
 	//THIS QUEUE SHOULD *NEVER* BE READ FROM DIRECTLY! ONLY TEMPORARY STORAGE UNTIL MOVED TO PROPER LINKED LIST IN CORE
-	private LinkedBlockingDeque<Double> databuffer; //Queue will hold all data that comes in over the network interface
+	private LinkedBlockingDeque<DataPoint> databuffer; //Queue will hold all data that comes in over the network interface
 	private boolean running; //Is the thread running
 	private Random rand;
+	private double starttime;
+	
 	
 	/**
 	 * Creates a NetworkThread. Is responsible for collection data from the network and putting it into a buffer to be copied.
 	 */
 	public NetworkThread(){
-		databuffer = new LinkedBlockingDeque<Double>();
+		databuffer = new LinkedBlockingDeque<DataPoint>();
 		running = true;
 		rand = new Random();
+		starttime = System.currentTimeMillis();
 	}
 	
 	/**
@@ -40,19 +43,19 @@ public class NetworkThread extends Thread{
 	 * the NetworkThread queue.
 	 * @param data The current data list.
 	 */
-	public void copyFromQueue(LinkedList<Double> data){
+	public void copyFromQueue(LinkedList<DataPoint> data){
 		databuffer.drainTo(data); //Moves all data from the buffer to the core data list.
 	}
 	
 	//Returns a fake double data point. Will be deleted at a later point.
-	public Double generateFakeData(){
-		double t = rand.nextDouble();
+	public DataPoint generateFakeData(){
+		float t = rand.nextFloat();
 		int s = rand.nextInt(100);
 		int sign = rand.nextInt(2);
 		if (sign != 1){
 			sign = -1;
 		}
-		return t*s*sign;
+		return new DataPoint(t*s*sign, (System.currentTimeMillis() - starttime)/1000l);
 	}
 
 	/**
@@ -62,9 +65,9 @@ public class NetworkThread extends Thread{
 	public void run() {
 		// TODO Auto-generated method stub
 		while(running){
-			Double d = generateFakeData();
+			DataPoint d = generateFakeData();
 			databuffer.addLast(d);
-			//System.out.println(d);
+			//System.out.println(d.getMagnitude() + " " + d.getTime());
 			
 			
 			
