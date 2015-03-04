@@ -83,6 +83,7 @@ public class NetworkThread extends Thread{
 		
 	}
 	
+	//test
 	public static void main(String[] args){
 		NetworkThread nthread = new NetworkThread();
 		nthread.start();
