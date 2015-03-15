@@ -18,6 +18,7 @@ public class Baselining {
     public Baselining(){
         sessionData = new LinkedList<DataPoint>();
         wristbandInterface = new NetworkThread();
+        wristbandInterface.start();
         sum = 0;
         baseline = 0;
         threshold = 0;
@@ -94,12 +95,11 @@ public class Baselining {
        LinkedList<DataPoint> temporaryNewData = new LinkedList<DataPoint>();
       
        wristbandInterface.copyFromQueue(temporaryNewData);
+       System.out.println(temporaryNewData.size());
        
       calculateBaseline(temporaryNewData);
       
       sessionData.addAll(temporaryNewData);
-        sessionData.add(wristbandInterface.generateFakeData());
-      
       baseline = sum/sessionData.size();
        
     }

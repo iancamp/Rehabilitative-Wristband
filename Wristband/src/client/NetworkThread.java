@@ -51,11 +51,7 @@ public class NetworkThread extends Thread{
 	public DataPoint generateFakeData(){
 		float t = rand.nextFloat();
 		int s = rand.nextInt(100);
-		int sign = rand.nextInt(2);
-		if (sign != 1){
-			sign = -1;
-		}
-		return new DataPoint(t*s*sign, (System.currentTimeMillis() - starttime)/1000l);
+		return new DataPoint(t*s, (System.currentTimeMillis() - starttime)/1000l);
 	}
 
 	/**
@@ -81,12 +77,6 @@ public class NetworkThread extends Thread{
 		
 		
 		
-	}
-	
-	//test
-	public static void main(String[] args){
-		NetworkThread nthread = new NetworkThread();
-		nthread.start();
 	}
 	
 }
