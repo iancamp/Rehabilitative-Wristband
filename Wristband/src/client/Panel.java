@@ -35,7 +35,6 @@ public class Panel extends JPanel{
     @Override
     public void paint (Graphics g) {
         super.paint(g);
-        baseline.updateData();
         LinkedList<DataPoint> values = baseline.getSessionData();
         g.setFont(new Font("Courier New", Font.PLAIN, 20));
         g.drawString("Data:", 42, 40);
@@ -49,26 +48,15 @@ public class Panel extends JPanel{
         for (int i = values.size()-1; i > Math.max(0, values.size() - 20); i--) {
             top20.add(values.get(i));
         }
-        int y = 20;
+        int y = 0;
         for(DataPoint d : top20){
-            char sign = ' ';
-            switch((int)Math.signum(d.getMagnitude())) {
-                case 1 : sign = '+'; g.setColor(this.green); break;
-                case 0 : sign = ' '; g.setColor(Color.BLACK);break;
-                case -1: sign = '-'; g.setColor(Color.RED);break;
-            }
             //this.setForeground(Color.BLUE);
             //g.setFont(g.getFont().setForeground(Color.BLUE));
-            g.drawString(
-                String.format(
-                    "%7.2f: %s %5.2f",
+            g.drawString(String.format(
+                    "%7.2f: %5.2f",
                     d.getTime(),
-                    sign,
                     Math.abs(d.getMagnitude())
-                ),
-                6,
-                40+y
-            );
+                ),6,60+y);
             y+=20;
         }
     }
