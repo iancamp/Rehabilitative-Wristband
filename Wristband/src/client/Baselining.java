@@ -6,6 +6,7 @@ import java.util.Collections;
 
 /**
  * Baselining class
+ * Objects calculates the average of the movement from the wristband
  * @author Group 1
  *
  */
@@ -31,16 +32,24 @@ public class Baselining {
     
     /**
      * Returns the sum of magnitudes of data in the current session
-     * @return sum
+     * @return The sum of the magnitudes collected in current session
      */
     public float getSum(){
         return sum;
     }
     
+    /**
+     * Returns the current averaged baseline for the current session
+     * @return The average of the magnitudes collected in current session
+     */
     public float getBaseline(){
         return baseline;
     }
     
+    /**
+     * Returns the last data point found in the session list
+     * @return The last data point
+     */
     public DataPoint getLastPoint(){
         return sessionData.getLast();
     }
@@ -49,7 +58,7 @@ public class Baselining {
     
     /**
      * Use to create a baselining object for testing purposes
-     * @return Baselining
+     * @return A Baselining object used in tests
      */
     public static Baselining generateTestBasline(){
         Baselining testBaseline = new Baselining();
@@ -63,7 +72,8 @@ public class Baselining {
     }
     
     /**
-     * Sorts the list of new data from the wristband
+     * Collects the most recent data from the wristband then sorts the list 
+     * of new data
      */
     public void addNewDataToSessionList(){
         LinkedList<DataPoint> newData = new LinkedList<DataPoint>();
@@ -83,19 +93,18 @@ public class Baselining {
         }
     }
     
-    
-    
-    /*
-    Getter for LinkedList of session data
-    */
+    /**
+     * Getter for LinkedList of session data
+     * @return A linked list of the data points collected in the current session
+     */
     public LinkedList<DataPoint> getSessionData(){
         return sessionData;
     }
     
-    /*
-    Gets newest data point from wristband, adds the data point to the list of
-    session data, and calculates current baseline
-    */
+    /**
+     * Gets newest data point from wristband, adds the data point to the list of
+     * session data, and calculates current baseline
+     */
     public void updateData(){
        LinkedList<DataPoint> temporaryNewData = new LinkedList<DataPoint>();
       
@@ -109,9 +118,10 @@ public class Baselining {
        
     }
     
-    /*
-    Calculates the current baseline
-    */
+    /**
+     * Calculates the current baseline
+     * @param magnitude  
+     */
     public void changeBaseline(float magnitude){
         sum += magnitude;
         baseline = sum/sessionData.size();
