@@ -3,7 +3,12 @@ import java.util.LinkedList;
 import java.util.Random;
 import java.util.concurrent.LinkedBlockingDeque;
 
-
+/**
+ * NetworkThread is the class responsible for listening on the network interface, and putting data points into a queue
+ * as they come in.
+ * @author Group 1
+ *
+ */
 public class NetworkThread extends Thread{
 	//THIS QUEUE SHOULD *NEVER* BE READ FROM DIRECTLY! ONLY TEMPORARY STORAGE UNTIL MOVED TO PROPER LINKED LIST IN CORE
 	private LinkedBlockingDeque<DataPoint> databuffer; //Queue will hold all data that comes in over the network interface
@@ -31,11 +36,10 @@ public class NetworkThread extends Thread{
 	}
 
 	/**
-	 * Used to deactivate the thread.
-	 * @param running Whether or not the thread should continue running.
+	 * Used to deactivate the thread. Should be called before threads are joined at the end of the application.
 	 */
-	public void setRunning(boolean running) {
-		this.running = running;
+	public void stopRunning() {
+		running = false;
 	}
 	
 	/**
@@ -47,8 +51,11 @@ public class NetworkThread extends Thread{
 		databuffer.drainTo(data); //Moves all data from the buffer to the core data list.
 	}
 	
-	//Returns a fake double data point. Will be deleted at a later point.
-	public DataPoint generateFakeData(){
+	/**
+	 * Generates a fake data point to be used, and gives it the current time.
+	 * @return Returns a randomly generated data point.
+	 */
+	private DataPoint generateFakeData(){
 		float t = rand.nextFloat();
 		int s = rand.nextInt(100);
 		return new DataPoint(t*s, (System.currentTimeMillis() - starttime)/1000l);

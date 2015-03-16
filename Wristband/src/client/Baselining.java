@@ -4,6 +4,11 @@ package client;
 import java.util.LinkedList;
 import java.util.Collections;
 
+/**
+ * Baselining class
+ * @author Group 1
+ *
+ */
 public class Baselining {
     private LinkedList<DataPoint> sessionData;
     private NetworkThread wristbandInterface;
