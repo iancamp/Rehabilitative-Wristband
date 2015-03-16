@@ -29,7 +29,7 @@ public class NetworkThread extends Thread{
 	
 	/**
 	 * Checks if the thread is currently running.
-	 * @return
+	 * @return Returns true if the thread is still running.
 	 */
 	public boolean isRunning() {
 		return running;
