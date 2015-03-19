@@ -37,13 +37,13 @@ public class Panel extends JPanel{
         super.paint(g);
         LinkedList<DataPoint> values = baseline.getSessionData();
         g.setFont(new Font("Courier New", Font.PLAIN, 20));
-        g.drawString("Data:", 42, 40);
-        g.drawString("Sum:", 220, 40);
+        g.drawString("Data:", 42, 200);
+        g.drawString("Sum:", 220, 200);
         //float sum = baseline.getSum();
-        g.drawString(baseline.getSum()+"", 220, 60); //need to append "" to make the float a String
-        g.drawString("Baseline:", 360, 40);
+        g.drawString(baseline.getSum()+"", 220, 220); //need to append "" to make the float a String
+        g.drawString("Baseline:", 360, 200);
         //float avg = baseline.getBaseline();
-        g.drawString(baseline.getBaseline()+"", 360, 60); //need to append "" to make the float a String
+        g.drawString(baseline.getBaseline()+"", 360, 220); //need to append "" to make the float a String
         LinkedList<DataPoint> top20 = new LinkedList<DataPoint>();
         for (int i = values.size()-1; i > Math.max(0, values.size() - 20); i--) {
             top20.add(values.get(i));
@@ -56,7 +56,7 @@ public class Panel extends JPanel{
                     "%7.2f: %5.2f",
                     d.getTime(),
                     Math.abs(d.getMagnitude())
-                ),6,60+y);
+                ),6,220+y);
             y+=20;
         }
     }
