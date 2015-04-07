@@ -1,4 +1,13 @@
 package client;
+import gnu.io.CommPortIdentifier;
+import gnu.io.SerialPort;
+import gnu.io.SerialPortEvent;
+import gnu.io.SerialPortEventListener;
+
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.util.Enumeration;
 import java.util.LinkedList;
 import java.util.Random;
 import java.util.concurrent.LinkedBlockingDeque;
@@ -9,13 +18,30 @@ import java.util.concurrent.LinkedBlockingDeque;
  * @author Group 1
  *
  */
-public class NetworkThread extends Thread{
+public class NetworkThread extends Thread implements SerialPortEventListener{
 	//THIS QUEUE SHOULD *NEVER* BE READ FROM DIRECTLY! ONLY TEMPORARY STORAGE UNTIL MOVED TO PROPER LINKED LIST IN CORE
 	private LinkedBlockingDeque<DataPoint> databuffer; //Queue will hold all data that comes in over the network interface
 	private boolean running; //Is the thread running
 	private Random rand;
 	private double starttime;
-	
+	private boolean randomon = false; //Whether or not random generation is turned on (used to test without arduino)
+	private SerialPort serialPort;
+	private int foundcom; //0 if still initializing. -1 if com not found. 1 if com found.
+	private final String USTRING = "arduts"; //The unique string prefix we are looking for.
+	private int attempts = 5; //How many attempts the program will make in trying to find the comm port.
+	/**
+	* A BufferedReader which will be fed by a InputStreamReader 
+	* converting the bytes into characters 
+	* making the displayed results codepage independent
+	*/
+	private BufferedReader input;
+	/** The output stream to the port */
+	private OutputStream output;
+	/** Milliseconds to block while waiting for port open */
+	private static final int TIME_OUT = 1000;
+	/** Default bits per second for COM port. */
+	private static final int DATA_RATE = 9600;
+
 	
 	/**
 	 * Creates a NetworkThread. Is responsible for collection data from the network and putting it into a buffer to be copied.
@@ -24,7 +50,22 @@ public class NetworkThread extends Thread{
 		databuffer = new LinkedBlockingDeque<DataPoint>();
 		running = true;
 		rand = new Random();
+		foundcom = 0;
+		//if (!randomon){ //If random is not turned on, start comm port setup.
+		//	startup();
+		//}
 		starttime = System.currentTimeMillis();
+	}
+	
+	/**
+	 * Returns the foundcom value, which can be one of the following:
+	 * 1:  The comm port has been found
+	 * 0:  The comm port is still being searched for
+	 * -1: The comm port was not found
+	 * @return Returns a value representing whether or not the comm port has been found.
+	 */
+	public int getFoundCom(){
+		return foundcom;
 	}
 	
 	/**
@@ -60,6 +101,153 @@ public class NetworkThread extends Thread{
 		int s = rand.nextInt(100);
 		return new DataPoint(t*s, (System.currentTimeMillis() - starttime)/1000l);
 	}
+	
+	/**
+	 * Attempts to find and set up the comm port. Called as part of the class initialization
+	 * unless random mode is turned on.
+	 */
+	private void startup() {
+		//System.setProperty("gnu.io.rxtx.SerialPorts", "/dev/ttyACM0");
+		foundcom = 0;
+		boolean found = false;
+		CommPortIdentifier portId = null;
+		//First, Find an instance of serial port as set in PORT_NAMES.
+		while (attempts > 0 && !found){
+			Enumeration portEnum = CommPortIdentifier.getPortIdentifiers();
+			while (portEnum.hasMoreElements()) {
+				CommPortIdentifier currPortId = (CommPortIdentifier) portEnum.nextElement();
+				System.out.println(currPortId.getName());
+
+				if (attemptCom(currPortId)){ //If the current comm port is the arduino
+					found=true;
+					System.out.println("SUCCESS!!!!");
+					break;
+				}
+			}
+			if (!found){
+				System.out.println("FAILURE #" + (6 - attempts));
+			}
+			attempts--;
+		}
+		if (!found) {
+			System.out.println("Could not find COM port.");
+			foundcom = -1;
+			return;
+		}
+	}
+	
+	/**
+	 * Attempts to listen on a certain comm port to find the arduino.
+	 * @param portId The given comm port
+	 * @return Returns true if the comm port was found. Otherwise false
+	 */
+	private boolean attemptCom(CommPortIdentifier portId){
+		try {
+			// open serial port, and use class name for the appName.
+			serialPort = (SerialPort) portId.open(this.getClass().getName(),
+					TIME_OUT);
+
+			// set port parameters
+			serialPort.setSerialPortParams(DATA_RATE,
+					SerialPort.DATABITS_8,
+					SerialPort.STOPBITS_1,
+					SerialPort.PARITY_NONE);
+
+			// open the streams
+			input = new BufferedReader(new InputStreamReader(serialPort.getInputStream()));
+			output = serialPort.getOutputStream();
+
+			// add event listeners
+			serialPort.addEventListener(this);
+			serialPort.notifyOnDataAvailable(true);
+			Thread.sleep(300); //Sleep for 300 MS to see if the message we wanted came through.
+			if (foundcom == 1){
+				return true;
+			}
+			else {
+				close(); //Close the bad com port.
+				return false;
+			}
+		} catch (Exception e) {
+			System.err.println(e.toString());
+		}
+		return false;
+	}
+	
+	/**
+	 * Parses the given string and tries to find the unique prefix sent by the arduino. Sets the foundcom flag to 1 if successful.
+	 * @param s The given string that is read in.
+	 */
+	private void parse(String s){
+		if (s.length() >= USTRING.length() && s.contains(USTRING)){
+			foundcom = 1; //We have found the com port, so set the flag.
+		}
+	}
+	
+	/**
+	 * Parses the given string, finds the unique prefix, and returns the number located beyond the unique prefix.
+	 * @param s The given string that is read in.
+	 * @return Returns the magnitude located within the string. Returns -1 if the data is incorrect.
+	 */
+	private float parseAndCrop(String s){
+		if (s.length() >= USTRING.length() && s.contains(USTRING)){
+			//Make sure the incoming data is not damaged and contains the correct string prefix.
+			String temp = s.substring(USTRING.length(), s.length()); //Get the magnitude as a String
+			//Now convert it into a number.
+			try{
+				float val = Float.parseFloat(temp);
+				return val;
+			} 
+			catch (Exception e){
+				//If something goes wrong with this value, we don't want it to crash
+				System.out.println("Garbage data");
+				return -1;
+			}
+		}
+		System.out.println("Garbage data");
+		return -1; //This should be caught and not be used to generate data
+	}
+
+	/**
+	 * This function should be called whenever the application terminates. Closes the comm port and prevents locking.
+	 */
+	public synchronized void close() {
+		if (serialPort != null) {
+			serialPort.removeEventListener();
+			serialPort.close();
+		}
+	}
+
+	/**
+	 * This function listens on the comm port for messages from the arduino
+	 */
+	public synchronized void serialEvent(SerialPortEvent oEvent) {
+		if (oEvent.getEventType() == SerialPortEvent.DATA_AVAILABLE) {
+			try {
+				String inputLine=input.readLine();
+				if (foundcom < 1){
+					parse(inputLine); //Check if the com port message is on this line
+				}
+				if (foundcom == 1){ //We found the com port, so start reading the data in
+					float val = parseAndCrop(inputLine);
+					if (Math.abs(val + 1) < 0.01){
+						//val = -1, i.e. an error. Do nothing since error was already printed.
+					}
+					else{ //if value is valid, add it to the list
+						databuffer.addLast(new DataPoint(val, (System.currentTimeMillis() - starttime)/1000l));
+						System.out.println("VALUE: " + val);
+					}
+				}
+			} catch (Exception e) {
+				System.err.println(e.toString());
+			}
+		}
+		// Ignore all the other eventTypes, but you should consider the other ones.
+	}
+	
+	
+	
+	
 
 	/**
 	 * The main loop of the NetworkThread. Reads in data from the network and puts it in the buffer.
@@ -67,13 +255,14 @@ public class NetworkThread extends Thread{
 	@Override
 	public void run() {
 		// TODO Auto-generated method stub
+		if (!randomon && foundcom != 1){
+			startup();
+		}
 		while(running){
-			DataPoint d = generateFakeData();
-			databuffer.addLast(d);
-			//System.out.println(d.getMagnitude() + " " + d.getTime());
-			
-			
-			
+			if (randomon){
+				DataPoint d = generateFakeData();
+				databuffer.addLast(d);
+			}
 			try {
 				sleep(250); //Thread should sleep for 250 ms to match the c code. Can possibly be removed later, may not be necessary.
 			} catch (InterruptedException e) {
