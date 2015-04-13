@@ -19,15 +19,21 @@ import java.util.concurrent.LinkedBlockingDeque;
  *
  */
 public class NetworkThread extends Thread implements SerialPortEventListener{
+	private final String USTRING = "arduts"; //The unique string prefix we are looking for.
+	private final int TO_INCREMENT = 200; //How many ms the searchtimeout will increment by after failure
+	private int searchtimeout = 300; //How many ms the thread will wait for response
+	private final double TIMEOUT_THRESHOLD = 5; //If no message is received in this time period, connection is assumed lost.
+	
 	//THIS QUEUE SHOULD *NEVER* BE READ FROM DIRECTLY! ONLY TEMPORARY STORAGE UNTIL MOVED TO PROPER LINKED LIST IN CORE
 	private LinkedBlockingDeque<DataPoint> databuffer; //Queue will hold all data that comes in over the network interface
 	private boolean running; //Is the thread running
 	private Random rand;
 	private double starttime;
+	private double lastreceived; //Last time a message was received from the device.
+	private boolean timeout; //Whether or not the device has timed out. True if no message received in last 5 seconds.
 	private boolean randomon = false; //Whether or not random generation is turned on (used to test without arduino)
 	private SerialPort serialPort;
 	private int foundcom; //0 if still initializing. -1 if com not found. 1 if com found.
-	private final String USTRING = "arduts"; //The unique string prefix we are looking for.
 	private int attempts = 5; //How many attempts the program will make in trying to find the comm port.
 	/**
 	* A BufferedReader which will be fed by a InputStreamReader 
@@ -51,10 +57,20 @@ public class NetworkThread extends Thread implements SerialPortEventListener{
 		running = true;
 		rand = new Random();
 		foundcom = 0;
+		timeout = false;
+		lastreceived = -1;
 		//if (!randomon){ //If random is not turned on, start comm port setup.
 		//	startup();
 		//}
 		starttime = System.currentTimeMillis();
+	}
+	
+	/**
+	 * Returns the timeout value. If true, the device has stopped sending data to the application.
+	 * @return Returns true if the device has stopped responding. Otherwise returns false.
+	 */
+	public boolean getTimeOut(){
+		return timeout;
 	}
 	
 	/**
@@ -103,6 +119,16 @@ public class NetworkThread extends Thread implements SerialPortEventListener{
 	}
 	
 	/**
+	 * Increments searchtimeout by TO_INCREMENT, never exceeding 5 seconds
+	 */
+	private void incrementSearchTO(){
+		searchtimeout+=TO_INCREMENT;
+		if (searchtimeout>5000){
+			searchtimeout=5000;
+		}
+	}
+	
+	/**
 	 * Attempts to find and set up the comm port. Called as part of the class initialization
 	 * unless random mode is turned on.
 	 */
@@ -125,6 +151,7 @@ public class NetworkThread extends Thread implements SerialPortEventListener{
 				}
 			}
 			if (!found){
+				incrementSearchTO(); //We didn't find com port, so search longer next time.
 				System.out.println("FAILURE #" + (6 - attempts));
 			}
 			attempts--;
@@ -132,6 +159,7 @@ public class NetworkThread extends Thread implements SerialPortEventListener{
 		if (!found) {
 			System.out.println("Could not find COM port.");
 			foundcom = -1;
+			running = false;
 			return;
 		}
 	}
@@ -160,7 +188,7 @@ public class NetworkThread extends Thread implements SerialPortEventListener{
 			// add event listeners
 			serialPort.addEventListener(this);
 			serialPort.notifyOnDataAvailable(true);
-			Thread.sleep(300); //Sleep for 300 MS to see if the message we wanted came through.
+			Thread.sleep(searchtimeout); //Sleep for 300 MS to see if the message we wanted came through.
 			if (foundcom == 1){
 				return true;
 			}
@@ -238,6 +266,7 @@ public class NetworkThread extends Thread implements SerialPortEventListener{
 						System.out.println("VALUE: " + val);
 					}
 				}
+				lastreceived = System.currentTimeMillis(); //We received a message, so update the time.
 			} catch (Exception e) {
 				System.err.println(e.toString());
 			}
@@ -269,9 +298,14 @@ public class NetworkThread extends Thread implements SerialPortEventListener{
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
+			if (lastreceived/1000l > TIMEOUT_THRESHOLD){
+				timeout = true;
+				running = false;
+				System.out.println("Timeout has occurred. Check the device connection.");
+			}
 		}
 		
-		
+		System.out.println("NetworkThread has finished running.");
 		
 	}
 	

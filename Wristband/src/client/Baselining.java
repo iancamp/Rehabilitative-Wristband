@@ -109,7 +109,7 @@ public class Baselining {
        LinkedList<DataPoint> temporaryNewData = new LinkedList<DataPoint>();
       
        wristbandInterface.copyFromQueue(temporaryNewData);
-       System.out.println(temporaryNewData.size());
+       //System.out.println(temporaryNewData.size());
        
       calculateBaseline(temporaryNewData);
       
