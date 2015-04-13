@@ -252,6 +252,7 @@ public class NetworkThread extends Thread implements SerialPortEventListener{
 	public synchronized void serialEvent(SerialPortEvent oEvent) {
 		if (oEvent.getEventType() == SerialPortEvent.DATA_AVAILABLE) {
 			try {
+				lastreceived = System.currentTimeMillis(); //We received a message, so update the time.
 				String inputLine=input.readLine();
 				if (foundcom < 1){
 					parse(inputLine); //Check if the com port message is on this line
@@ -266,7 +267,6 @@ public class NetworkThread extends Thread implements SerialPortEventListener{
 						System.out.println("VALUE: " + val);
 					}
 				}
-				lastreceived = System.currentTimeMillis(); //We received a message, so update the time.
 			} catch (Exception e) {
 				System.err.println(e.toString());
 			}
@@ -298,9 +298,12 @@ public class NetworkThread extends Thread implements SerialPortEventListener{
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-			if (lastreceived/1000l > TIMEOUT_THRESHOLD){
+			double temptime = (System.currentTimeMillis() - lastreceived)/1000;
+			if (foundcom == 1 && temptime > TIMEOUT_THRESHOLD){
+				System.out.println("TIMEOUT AT: " + temptime);
 				timeout = true;
 				running = false;
+				close();
 				System.out.println("Timeout has occurred. Check the device connection.");
 			}
 		}
