@@ -12,10 +12,37 @@ public class Panel extends JPanel{
     JFrame frame;
     Baselining baseline;
     Color green;
+    JButton baseliningButton;
+    JButton learningButton;
+    JButton summaryButton;
+    JSlider thresholdControl;
     
     public Panel(JFrame frame, Baselining baseline) {
         this.frame = frame;
         this.baseline = baseline;
+
+        this.baseliningButton = new JButton("Start Baselining Phase");
+        baseliningButton.setBounds(50,10,300,50);
+
+        this.learningButton = new JButton("Start Learning Phase");
+        learningButton.setBounds(400,10,300,50);
+
+        summaryButton = new JButton("Summary");
+        summaryButton.setBounds(550,170,200,50);
+
+        /* Create Slider for adjusting Threshold */
+        thresholdControl = new JSlider(JSlider.HORIZONTAL,0,100,50);
+        thresholdControl.setBounds(10, 70, 700, 100);
+        thresholdControl.setMajorTickSpacing(10);
+        thresholdControl.setMinorTickSpacing(1);
+        thresholdControl.setPaintTicks(true);
+        thresholdControl.setPaintLabels(true);
+
+        this.setLayout(null);
+        this.add(baseliningButton);
+        this.add(learningButton);
+        this.add(summaryButton);
+        this.add(thresholdControl);
         
         frame.getContentPane().add(this);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
