@@ -11,5 +11,9 @@
     <orderEntry type="library" name="sqlite-jdbc-3.8.7" level="project" />
     <orderEntry type="library" name="RXTXcomm" level="project" />
     <orderEntry type="library" name="x86_64-unknown-linux-gnu" level="project" />
+    <orderEntry type="library" name="RXTXcomm" level="project" />
+    <orderEntry type="library" name="sqlite-jdbc-3.8.7" level="project" />
+    <orderEntry type="library" name="SysWOW64" level="project" />
+    <orderEntry type="library" name="junit-4.10" level="project" />
   </component>
 </module>

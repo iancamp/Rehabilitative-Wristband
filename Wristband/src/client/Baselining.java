@@ -75,19 +75,20 @@ public class Baselining {
      * Collects the most recent data from the wristband then sorts the list 
      * of new data
      */
-    public void addNewDataToSessionList(){
+   /* public void addNewDataToSessionList(){
         LinkedList<DataPoint> newData = new LinkedList<DataPoint>();
       
         wristbandInterface.copyFromQueue(newData);
         Collections.sort(newData);
         
-    }    
+    }    */
     
     /**
-     * Calculates the current baseline
-     * @param list 
+     * Adds the sum of a list to the baseline's sum
+     * @param list
+     *
      */
-    public void calculateBaseline(LinkedList<DataPoint> list){
+    public void updateSum(LinkedList<DataPoint> list){
         for(DataPoint currentPoint:list){
             sum += currentPoint.getMagnitude();
         }
@@ -111,7 +112,7 @@ public class Baselining {
        wristbandInterface.copyFromQueue(temporaryNewData);
        //System.out.println(temporaryNewData.size());
        
-      calculateBaseline(temporaryNewData);
+      updateSum(temporaryNewData);
       
       sessionData.addAll(temporaryNewData);
       baseline = sum/sessionData.size();
@@ -122,10 +123,10 @@ public class Baselining {
      * Calculates the current baseline
      * @param magnitude  
      */
-    public void changeBaseline(float magnitude){
+    /*public void changeBaseline(float magnitude){
         sum += magnitude;
         baseline = sum/sessionData.size();
-    }
+    }*/
     
 }
  
