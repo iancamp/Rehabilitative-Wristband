@@ -38,7 +38,6 @@ public class NetworkThread extends Thread implements SerialPortEventListener{
 	/**
 	* A BufferedReader which will be fed by a InputStreamReader 
 	* converting the bytes into characters 
-	* making the displayed results codepage independent
 	*/
 	private BufferedReader input;
 	/** The output stream to the port */
