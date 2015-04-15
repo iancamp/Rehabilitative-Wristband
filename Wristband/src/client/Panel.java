@@ -3,6 +3,8 @@ package client;
 import javax.swing.*;
 import javax.xml.crypto.Data;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.LinkedList;
 
 /**
@@ -11,7 +13,6 @@ import java.util.LinkedList;
 public class Panel extends JPanel{
     JFrame frame;
     Baselining baseline;
-    Color green;
     JButton baseliningButton;
     JButton learningButton;
     JButton summaryButton;
@@ -25,32 +26,35 @@ public class Panel extends JPanel{
         this.frame = frame;
         this.baseline = baseline;
 
-        this.timeControl = new JSpinner(new SpinnerNumberModel(2.0,.5,5.0,.5));
-        timeControl.setBounds((int)(.2*startingWidth),(int)(.02*startingHeight),(int)(.6*startingWidth),(int)(.07*startingHeight));
+        timeControl = new JSpinner(new SpinnerNumberModel(2,.5,10,.5));
+        timeControl.setFont(new Font("Courier New", Font.PLAIN, 20));
 
-        this.baseliningButton = new JButton("Start Baselining Phase");
-        baseliningButton.setBounds((int)(.05*startingWidth),(int)(.1*startingHeight),(int)(.42*startingWidth),(int)(.1*startingHeight));
+        baseliningButton = new JButton("Start Baselining Phase");
 
-        this.learningButton = new JButton("Start Learning Phase");
-        learningButton.setBounds((int)(.5*startingWidth),(int)(.1*startingHeight),(int)(.42*startingWidth),(int)(.1*startingHeight));
+        learningButton = new JButton("Start Learning Phase");
 
+        /*Create Summary Button & Implementation for OnClick */
         summaryButton = new JButton("Summary");
-        summaryButton.setBounds((int)(.65*startingWidth),(int)(.35*startingHeight),(int)(.25*startingWidth),(int)(.08*startingHeight));
+        summaryButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent evt) {
+                new Summary(new JFrame());
+            }
+        });
 
         /* Create Slider for adjusting Threshold */
         thresholdControl = new JSlider(JSlider.HORIZONTAL,0,100,50);
-        thresholdControl.setBounds((int)(.04*startingWidth),(int)(.24*startingHeight),(int)(.9*startingWidth),(int)(.08*startingHeight));
         thresholdControl.setMajorTickSpacing(10);
         thresholdControl.setMinorTickSpacing(1);
         thresholdControl.setPaintTicks(true);
         thresholdControl.setPaintLabels(true);
 
+        /*Add all Buttons & Inputs to the Form */
         this.setLayout(null);
+        this.add(timeControl);
         this.add(baseliningButton);
         this.add(learningButton);
         this.add(summaryButton);
         this.add(thresholdControl);
-        this.add(timeControl);
         
         frame.getContentPane().add(this);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -58,9 +62,11 @@ public class Panel extends JPanel{
         frame.setResizable(true);
         frame.setAlwaysOnTop(false);
         frame.setVisible(true);
-        frame.setTitle("Test Window");
+        frame.setTitle("WristBand");
         frame.setBackground(Color.white);
-        green = new Color(5,128,0);
+        //green = new Color(5,128,0);
+
+        frame.setMinimumSize(new Dimension(400,300));
     }
 
     /**
@@ -76,8 +82,8 @@ public class Panel extends JPanel{
         g.drawString("Data:", (int)(.1*this.getWidth()), (int)(.4*this.getHeight()));
         g.drawString("Sum:", (int)(.25*this.getWidth()), (int)(.4*this.getHeight()));
         //float sum = baseline.getSum();
-        g.drawString(baseline.getSum()+"", (int)(.45*this.getWidth()), (int)(.4*this.getHeight())+30); //need to append "" to make the float a String
-        g.drawString("Baseline:", (int)(.45*this.getWidth()), (int)(.4*this.getHeight()));
+        g.drawString(baseline.getSum()+"", (int)(.4*this.getWidth()), (int)(.4*this.getHeight())+30); //need to append "" to make the float a String
+        g.drawString("Baseline:", (int)(.4*this.getWidth()), (int)(.4*this.getHeight()));
         //float avg = baseline.getBaseline();
         g.drawString(baseline.getBaseline()+"", (int)(.25*this.getWidth()), (int)(.4*this.getHeight())+30); //need to append "" to make the float a String
         LinkedList<DataPoint> top20 = new LinkedList<DataPoint>();
@@ -92,17 +98,18 @@ public class Panel extends JPanel{
                     "%7.2f: %5.2f",
                     d.getTime(),
                     Math.abs(d.getMagnitude())
-                ),(int)(.1*this.getWidth()),(int)(.4*this.getHeight())+y);
-            y+=20;
+                ),(int)(.1*this.getWidth()),(int)(.4*this.getHeight()) + y);
+            y += 20;
         }
 
         /* Reset all buttons and inputs if window was resized */
-        timeControl.setBounds((int)(.2*getWidth()),(int)(.02*getHeight()),(int)(.6*getWidth()),(int)(.07*getHeight()));
+        timeControl.setBounds((int) (.2 * getWidth()), (int) (.02 * getHeight()), (int) (.6 * getWidth()), (int) (.07 * getHeight()));
         baseliningButton.setBounds((int)(.05*getWidth()),(int)(.1*getHeight()),(int)(.42*getWidth()),(int)(.1*getHeight()));
         learningButton.setBounds((int)(.5*getWidth()),(int)(.1*getHeight()),(int)(.42*getWidth()),(int)(.1*getHeight()));
         summaryButton.setBounds((int)(.65*getWidth()),(int)(.35*getHeight()),(int)(.25*getWidth()),(int)(.08*getHeight()));
         summaryButton.setBounds((int)(.65*getWidth()),(int)(.35*getHeight()),(int)(.25*getWidth()),(int)(.08*getHeight()));
         thresholdControl.setBounds((int)(.04*getWidth()),(int)(.24*getHeight()),(int)(.9*getWidth()),(int)(.08*getHeight()));
+        revalidate();
     }
 
 }
