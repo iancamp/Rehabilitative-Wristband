@@ -35,9 +35,10 @@ public class Panel extends JPanel{
 
         /*Create Summary Button & Implementation for OnClick */
         summaryButton = new JButton("Summary");
+        final Baselining b2 = baseline;
         summaryButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent evt) {
-                new Summary(new JFrame());
+                new Summary(new JFrame(), b2);
             }
         });
 
