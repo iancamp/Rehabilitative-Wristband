@@ -192,7 +192,7 @@ public class NetworkThread extends Thread implements SerialPortEventListener{
 				return true;
 			}
 			else {
-				close(); //Close the bad com port.
+				closePort(); //Close the bad com port.
 				return false;
 			}
 		} catch (Exception e) {
@@ -236,13 +236,22 @@ public class NetworkThread extends Thread implements SerialPortEventListener{
 	}
 
 	/**
-	 * This function should be called whenever the application terminates. Closes the comm port and prevents locking.
+	 * Closes the current open comm port to prevent locking.
 	 */
-	public synchronized void close() {
+	private void closePort() {
 		if (serialPort != null) {
 			serialPort.removeEventListener();
 			serialPort.close();
 		}
+	}
+	
+	/**
+	 * This function should be called whenever the application terminates. Closes the comm port to prevent locking,
+	 * and stops the execution of the thread.
+	 */
+	public synchronized void close(){
+		closePort();
+		running = false;
 	}
 
 	/**
@@ -302,7 +311,7 @@ public class NetworkThread extends Thread implements SerialPortEventListener{
 				System.out.println("TIMEOUT AT: " + temptime);
 				timeout = true;
 				running = false;
-				close();
+				closePort();
 				System.out.println("Timeout has occurred. Check the device connection.");
 			}
 		}
