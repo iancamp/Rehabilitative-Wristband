@@ -45,7 +45,13 @@ public class Baselining {
     public float getBaseline(){
         return baseline;
     }
-    
+
+    /**
+     * Returns the network thread of the baseline
+     * @return The baseline's network thread
+     */
+    public NetworkThread getWristbandInterface(){return wristbandInterface;}
+
     /**
      * Returns the last data point found in the session list
      * @return The last data point
