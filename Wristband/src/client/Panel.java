@@ -5,6 +5,8 @@ import javax.xml.crypto.Data;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.util.LinkedList;
 
 /**
@@ -68,6 +70,12 @@ public class Panel extends JPanel{
         //green = new Color(5,128,0);
 
         frame.setMinimumSize(new Dimension(400,300));
+
+        frame.addWindowListener(new WindowAdapter() {
+            public void windowClosing(WindowEvent e) {
+                System.out.println("Window closing");
+            }
+        });
     }
 
     /**
