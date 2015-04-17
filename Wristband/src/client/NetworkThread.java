@@ -21,6 +21,7 @@ import java.util.concurrent.LinkedBlockingDeque;
 public class NetworkThread extends Thread implements SerialPortEventListener{
 	private final String USTRING = "arduts"; //The unique string prefix we are looking for.
 	private final int TO_INCREMENT = 200; //How many ms the searchtimeout will increment by after failure
+	private final int NUMATTEMPTS = 5;//Number of attempts that will be made to connect.
 	private int searchtimeout = 300; //How many ms the thread will wait for response
 	private final double TIMEOUT_THRESHOLD = 5; //If no message is received in this time period, connection is assumed lost.
 	
@@ -34,7 +35,7 @@ public class NetworkThread extends Thread implements SerialPortEventListener{
 	private boolean randomon = false; //Whether or not random generation is turned on (used to test without arduino)
 	private SerialPort serialPort;
 	private int foundcom; //0 if still initializing. -1 if com not found. 1 if com found.
-	private int attempts = 5; //How many attempts the program will make in trying to find the comm port.
+	private int attempts; //How many attempts the program will make in trying to find the comm port.
 	/**
 	* A BufferedReader which will be fed by a InputStreamReader 
 	* converting the bytes into characters 
@@ -58,6 +59,7 @@ public class NetworkThread extends Thread implements SerialPortEventListener{
 		foundcom = 0;
 		timeout = false;
 		lastreceived = -1;
+		attempts = NUMATTEMPTS;
 		//if (!randomon){ //If random is not turned on, start comm port setup.
 		//	startup();
 		//}
@@ -128,11 +130,31 @@ public class NetworkThread extends Thread implements SerialPortEventListener{
 	}
 	
 	/**
+	 * Call to attempt a restart if the device failed to connect.
+	 * Only allowed to be called if the program failed to connect. Otherwise will do nothing.
+	 */
+	public void restartFailedToConnect(){
+		if (foundcom == -1){
+			startup();
+		}
+	}
+	
+	/**
+	 * If the device times out during an active connection, this function will attempt a reconnection.
+	 */
+	public void restartTimeout(){
+		closePort();
+		timeout = false;
+		startup();
+	}
+	
+	/**
 	 * Attempts to find and set up the comm port. Called as part of the class initialization
 	 * unless random mode is turned on.
 	 */
 	private void startup() {
 		//System.setProperty("gnu.io.rxtx.SerialPorts", "/dev/ttyACM0");
+		attempts = NUMATTEMPTS;
 		foundcom = 0;
 		boolean found = false;
 		CommPortIdentifier portId = null;
@@ -158,7 +180,6 @@ public class NetworkThread extends Thread implements SerialPortEventListener{
 		if (!found) {
 			System.out.println("Could not find COM port.");
 			foundcom = -1;
-			running = false;
 			return;
 		}
 	}
@@ -192,7 +213,7 @@ public class NetworkThread extends Thread implements SerialPortEventListener{
 				return true;
 			}
 			else {
-				close(); //Close the bad com port.
+				closePort(); //Close the bad com port.
 				return false;
 			}
 		} catch (Exception e) {
@@ -236,13 +257,22 @@ public class NetworkThread extends Thread implements SerialPortEventListener{
 	}
 
 	/**
-	 * This function should be called whenever the application terminates. Closes the comm port and prevents locking.
+	 * Closes the current open comm port to prevent locking.
 	 */
-	public synchronized void close() {
+	private void closePort() {
 		if (serialPort != null) {
 			serialPort.removeEventListener();
 			serialPort.close();
 		}
+	}
+	
+	/**
+	 * This function should be called whenever the application terminates. Closes the comm port to prevent locking,
+	 * and stops the execution of the thread.
+	 */
+	public synchronized void close(){
+		closePort();
+		running = false;
 	}
 
 	/**
@@ -273,7 +303,9 @@ public class NetworkThread extends Thread implements SerialPortEventListener{
 		// Ignore all the other eventTypes, but you should consider the other ones.
 	}
 	
-	
+	public synchronized void sendThreshold(){
+		
+	}
 	
 	
 
@@ -285,6 +317,9 @@ public class NetworkThread extends Thread implements SerialPortEventListener{
 		// TODO Auto-generated method stub
 		if (!randomon && foundcom != 1){
 			startup();
+		}
+		else if (randomon){
+			foundcom = 1;
 		}
 		while(running){
 			if (randomon){
@@ -301,8 +336,7 @@ public class NetworkThread extends Thread implements SerialPortEventListener{
 			if (foundcom == 1 && temptime > TIMEOUT_THRESHOLD){
 				System.out.println("TIMEOUT AT: " + temptime);
 				timeout = true;
-				running = false;
-				close();
+				closePort();
 				System.out.println("Timeout has occurred. Check the device connection.");
 			}
 		}
