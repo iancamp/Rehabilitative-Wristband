@@ -100,7 +100,7 @@ public class Baselining {
      */
     public void updateSumMax(LinkedList<DataPoint> list){
         for(DataPoint currentPoint:list){
-            if(max < curretntPoint.magnitude){max = currentPoint.magnitude;}
+            if(max < currentPoint.getMagnitude()){max = currentPoint.getMagnitude();}
             sum += currentPoint.getMagnitude();
         }
     }
@@ -123,7 +123,7 @@ public class Baselining {
        wristbandInterface.copyFromQueue(temporaryNewData);
        //System.out.println(temporaryNewData.size());
        
-      updateSum(temporaryNewData);
+      updateSumMax(temporaryNewData);
       
       sessionData.addAll(temporaryNewData);
       baseline = sum/sessionData.size();
@@ -136,10 +136,10 @@ public class Baselining {
      * @return List of strings [high, medium, or low]
      */
     public LinkedList<String> himedlo(LinkedList<DataPoint> data){
-        LinkedList<String> himedlo = new LinkedList<String>()
+        LinkedList<String> himedlo = new LinkedList<String>();
                 for(DataPoint currentpoint : data){
-                    if(currentpoint.magnitude <= (.25*max)){himedlo.add("Low");}
-                    else if(currentpoint.magnitude <= (.75 * max)){himedlo.add("Medium");}
+                    if(currentpoint.getMagnitude() <= (.25*max)){himedlo.add("Low");}
+                    else if(currentpoint.getMagnitude() <= (.75 * max)){himedlo.add("Medium");}
                     else{himedlo.add("High");}
                 }
         return himedlo;}
@@ -152,11 +152,10 @@ public class Baselining {
         Baselining session = new Baselining();
         LinkedList<DataPoint> tempdata = new LinkedList<DataPoint>();
         session.wristbandInterface.copyFromQueue(tempdata);
-        tempdata.delete();
         long startTime = System.currentTimeMillis();
         while((System.currentTimeMillis()-startTime)< minutes*60*1000){
             session.updateData();}
-        session.threshold = session.baseline + ((session.max - session.baseline)*.7);
+        session.threshold = (float)(session.baseline + ((session.max - session.baseline)*.7));
         //learningPhase(minutes, phasecount, session.threshold);}
     
     /**
@@ -168,5 +167,5 @@ public class Baselining {
         baseline = sum/sessionData.size();
     }*/
     
-}
+}}
  
