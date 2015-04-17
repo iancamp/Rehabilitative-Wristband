@@ -135,9 +135,17 @@ public class NetworkThread extends Thread implements SerialPortEventListener{
 	 */
 	public void restartFailedToConnect(){
 		if (foundcom == -1){
-			attempts = NUMATTEMPTS;
 			startup();
 		}
+	}
+	
+	/**
+	 * If the device times out during an active connection, this function will attempt a reconnection.
+	 */
+	public void restartTimeout(){
+		closePort();
+		timeout = false;
+		startup();
 	}
 	
 	/**
@@ -146,6 +154,7 @@ public class NetworkThread extends Thread implements SerialPortEventListener{
 	 */
 	private void startup() {
 		//System.setProperty("gnu.io.rxtx.SerialPorts", "/dev/ttyACM0");
+		attempts = NUMATTEMPTS;
 		foundcom = 0;
 		boolean found = false;
 		CommPortIdentifier portId = null;
