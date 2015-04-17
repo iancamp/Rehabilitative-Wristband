@@ -21,6 +21,7 @@ import java.util.concurrent.LinkedBlockingDeque;
 public class NetworkThread extends Thread implements SerialPortEventListener{
 	private final String USTRING = "arduts"; //The unique string prefix we are looking for.
 	private final int TO_INCREMENT = 200; //How many ms the searchtimeout will increment by after failure
+	private final int NUMATTEMPTS = 5;//Number of attempts that will be made to connect.
 	private int searchtimeout = 300; //How many ms the thread will wait for response
 	private final double TIMEOUT_THRESHOLD = 5; //If no message is received in this time period, connection is assumed lost.
 	
@@ -34,7 +35,7 @@ public class NetworkThread extends Thread implements SerialPortEventListener{
 	private boolean randomon = false; //Whether or not random generation is turned on (used to test without arduino)
 	private SerialPort serialPort;
 	private int foundcom; //0 if still initializing. -1 if com not found. 1 if com found.
-	private int attempts = 5; //How many attempts the program will make in trying to find the comm port.
+	private int attempts; //How many attempts the program will make in trying to find the comm port.
 	/**
 	* A BufferedReader which will be fed by a InputStreamReader 
 	* converting the bytes into characters 
@@ -58,6 +59,7 @@ public class NetworkThread extends Thread implements SerialPortEventListener{
 		foundcom = 0;
 		timeout = false;
 		lastreceived = -1;
+		attempts = NUMATTEMPTS;
 		//if (!randomon){ //If random is not turned on, start comm port setup.
 		//	startup();
 		//}
@@ -133,6 +135,7 @@ public class NetworkThread extends Thread implements SerialPortEventListener{
 	 */
 	public void restartFailedToConnect(){
 		if (foundcom == -1){
+			attempts = NUMATTEMPTS;
 			startup();
 		}
 	}
