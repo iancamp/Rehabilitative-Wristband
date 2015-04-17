@@ -19,7 +19,7 @@ public class Baselining {
     private float threshold;
     private float sum;
     private float max;
-    
+
     /**
      * Constructor to create a Baselining object
      */
@@ -32,7 +32,7 @@ public class Baselining {
         threshold = 0;
         max = 0;
     }
-    
+
     /**
      * Returns the sum of magnitudes of data in the current session
      * @return The sum of the magnitudes collected in current session
@@ -40,7 +40,7 @@ public class Baselining {
     public float getSum(){
         return sum;
     }
-    
+
     /**
      * Returns the current averaged baseline for the current session
      * @return The average of the magnitudes collected in current session
@@ -62,9 +62,9 @@ public class Baselining {
     public DataPoint getLastPoint(){
         return sessionData.getLast();
     }
-    
-    
-    
+
+
+
     /**
      * Use to create a baselining object for testing purposes
      * @return A Baselining object used in tests
@@ -77,10 +77,10 @@ public class Baselining {
         testBaseline.sum = (float) 3;
         testBaseline.baseline = (float) 1.5;
         testBaseline.max = (float) 2.0;
-        
+
         return testBaseline;
     }
-    
+
     /**
      * Collects the most recent data from the wristband then sorts the list 
      * of new data
@@ -92,7 +92,7 @@ public class Baselining {
         Collections.sort(newData);
         
     }    */
-    
+
     /**
      * Adds the sum of a list to the baseline's sum and if any point's magnitude is larger than max, sets max to that magnitude
      * @param list
@@ -100,11 +100,11 @@ public class Baselining {
      */
     public void updateSumMax(LinkedList<DataPoint> list){
         for(DataPoint currentPoint:list){
-            if(max < curretntPoint.magnitude){max = currentPoint.magnitude;}
+            if(max < currentPoint.getMagnitude()){max = currentPoint.getMagnitude();}
             sum += currentPoint.getMagnitude();
         }
     }
-    
+
     /**
      * Getter for LinkedList of session data
      * @return A linked list of the data points collected in the current session
@@ -112,22 +112,22 @@ public class Baselining {
     public LinkedList<DataPoint> getSessionData(){
         return sessionData;
     }
-    
+
     /**
      * Gets newest data point from wristband, adds the data point to the list of
      * session data, and calculates current baseline
      */
     public void updateData(){
-       LinkedList<DataPoint> temporaryNewData = new LinkedList<DataPoint>();
-      
-       wristbandInterface.copyFromQueue(temporaryNewData);
-       //System.out.println(temporaryNewData.size());
-       
-      updateSum(temporaryNewData);
-      
-      sessionData.addAll(temporaryNewData);
-      baseline = sum/sessionData.size();
-       
+        LinkedList<DataPoint> temporaryNewData = new LinkedList<DataPoint>();
+
+        wristbandInterface.copyFromQueue(temporaryNewData);
+        //System.out.println(temporaryNewData.size());
+
+        updateSumMax(temporaryNewData);
+
+        sessionData.addAll(temporaryNewData);
+        baseline = sum/sessionData.size();
+
     }
 
     /**
@@ -136,12 +136,12 @@ public class Baselining {
      * @return List of strings [high, medium, or low]
      */
     public LinkedList<String> himedlo(LinkedList<DataPoint> data){
-        LinkedList<String> himedlo = new LinkedList<String>()
-                for(DataPoint currentpoint : data){
-                    if(currentpoint.magnitude <= (.25*max)){himedlo.add("Low");}
-                    else if(currentpoint.magnitude <= (.75 * max)){himedlo.add("Medium");}
-                    else{himedlo.add("High");}
-                }
+        LinkedList<String> himedlo = new LinkedList<String>();
+        for(DataPoint currentpoint : data){
+            if(currentpoint.getMagnitude() <= (.25*max)){himedlo.add("Low");}
+            else if(currentpoint.getMagnitude() <= (.75 * max)){himedlo.add("Medium");}
+            else{himedlo.add("High");}
+        }
         return himedlo;}
 
     /**
@@ -152,21 +152,20 @@ public class Baselining {
         Baselining session = new Baselining();
         LinkedList<DataPoint> tempdata = new LinkedList<DataPoint>();
         session.wristbandInterface.copyFromQueue(tempdata);
-        tempdata.delete();
         long startTime = System.currentTimeMillis();
         while((System.currentTimeMillis()-startTime)< minutes*60*1000){
             session.updateData();}
-        session.threshold = session.baseline + ((session.max - session.baseline)*.7);
+        session.threshold = (float)(session.baseline + ((session.max - session.baseline)*.7));
         //learningPhase(minutes, phasecount, session.threshold);}
-    
-    /**
-     * Calculates the current baseline
-     * @param magnitude  
-     */
+
+        /**
+         * Calculates the current baseline
+         * @param magnitude
+         */
     /*public void changeBaseline(float magnitude){
         sum += magnitude;
         baseline = sum/sessionData.size();
     }*/
-    
-}
+
+    }}
  
