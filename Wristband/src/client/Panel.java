@@ -24,10 +24,11 @@ public class Panel extends JPanel{
     JSpinner timeControl;
 
     JButton arduinoFail;
+    JButton arduinoTimeOut;
 
     int startingWidth = 800;
     int startingHeight = 600;
-    
+
     public Panel(JFrame frame, Baselining baseline) {
         this.frame = frame;
         this.baseline = baseline;
@@ -61,8 +62,17 @@ public class Panel extends JPanel{
         arduinoFail.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent evt) {
                 networkThread.restartFailedToConnect();
-                arduinoFail.invalidate();
                 arduinoFail.setVisible(false);
+            }
+        });
+
+        /*Create Button for Loss of Connection to Arduino */
+        arduinoTimeOut = new JButton("Retry");
+        arduinoTimeOut.setVisible(false);
+        arduinoTimeOut.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent evt) {
+                networkThread.restartTimeout();
+                arduinoTimeOut.setVisible(false);
             }
         });
 
@@ -74,7 +84,8 @@ public class Panel extends JPanel{
         this.add(summaryButton);
         this.add(thresholdControl);
         this.add(arduinoFail);
-        
+        this.add(arduinoTimeOut);
+
         frame.getContentPane().add(this);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setSize(startingWidth, startingHeight);
@@ -99,7 +110,7 @@ public class Panel extends JPanel{
      * paint(Graphics g) is called repeatedly whenever possible to 
      * repaint the window until the user exits the window. Repaint can be 
      * called to force an update immediately.
-    */
+     */
     @Override
     public void paint (Graphics g) {
         super.paint(g);
@@ -114,6 +125,10 @@ public class Panel extends JPanel{
             g.drawString("Failed to find Arduino!", (int) (.25 * getWidth()), (int) (.4 * getHeight()));
             arduinoFail.setVisible(true);
             arduinoFail.setBounds((int) (.25 * getWidth()), (int) (.55 * getHeight()), (int) (.35 * getWidth()), (int) (.13 * getHeight()));
+        }
+        else if(networkThread.getTimeOut()){
+            arduinoTimeOut.setBounds((int) (.25 * getWidth()), (int) (.55 * getHeight()), (int) (.35 * getWidth()), (int) (.13 * getHeight()));
+            arduinoTimeOut.setVisible(true);
         }
         else { //success
 
