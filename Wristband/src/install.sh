@@ -1,7 +1,7 @@
 #!/bin/bash
 #make necessary changes to the file system so the host interfaces with an arduino correctly
 
-USER1 = $1
+USER1=$1
 
 echo "$USER1"
 
