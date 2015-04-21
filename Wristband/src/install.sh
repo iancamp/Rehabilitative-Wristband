@@ -6,17 +6,17 @@ USER1=$1
 echo "$USER1"
 
 #create /var/lock directory if it doesn't exist
-if ! [[ -d /var/lock ]]; then
+if [[ ! -d /var/lock ]]; then
 	echo "mkdir /var/lock"
 fi
 
 #Change group permissions on /var/lock to uucp
-if ! [[ $(ls -l /var/lock | awk -v col=4 '{print $col}') = "uucp" ]]; then
+if [[ ! $(ls -l /var/lock | awk -v col=4 '{print $col}') = "uucp" ]]; then
 	echo "chgrp uucp /var/lock"
 fi
 
 #Change permissions on /var/lock to 775 if it is not 775
-if ! [[ $(stat -f %Mp%Lp /var/lock) = "0775" ]]; then
+if [[ ! $(stat -f %Mp%Lp /var/lock) = "0775" ]]; then
 	echo "chmod 775 /var/lock"
 fi
 
