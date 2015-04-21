@@ -21,6 +21,7 @@ import java.util.concurrent.LinkedBlockingDeque;
  */
 public class NetworkThread extends Thread implements SerialPortEventListener{
 	private final String USTRING = "arduts"; //The unique string prefix we are looking for.
+	private final String ACKSTRING = "ack"; //Unique ACK string prefix for an ACK response
 	private final int TO_INCREMENT = 200; //How many ms the searchtimeout will increment by after failure
 	private final int NUMATTEMPTS = 5;//Number of attempts that will be made to connect.
 	private int searchtimeout = 300; //How many ms the thread will wait for response
@@ -40,6 +41,7 @@ public class NetworkThread extends Thread implements SerialPortEventListener{
 	private boolean reset = false; //Whether or not we need to reset. True if reset is called for.
 	private int threshold = 0; //Current threshold that should be sent over
 	private boolean sendthreshold = false; //Whether or not the threshold needs to be sent and updated on the device.
+	private boolean ack = false; //Whether or not we received an ack response from the Arduino after sending threshold.
 	/**
 	* A BufferedReader which will be fed by a InputStreamReader 
 	* converting the bytes into characters 
@@ -240,12 +242,13 @@ public class NetworkThread extends Thread implements SerialPortEventListener{
 	/**
 	 * Parses the given string, finds the unique prefix, and returns the number located beyond the unique prefix.
 	 * @param s The given string that is read in.
+	 * @param u Unique string given to compare to.
 	 * @return Returns the magnitude located within the string. Returns -1 if the data is incorrect.
 	 */
-	private float parseAndCrop(String s){
-		if (s.length() >= USTRING.length() && s.contains(USTRING)){
+	private float parseAndCrop(String s, String u){
+		if (s.length() >= u.length() && s.contains(u)){
 			//Make sure the incoming data is not damaged and contains the correct string prefix.
-			String temp = s.substring(USTRING.length(), s.length()); //Get the magnitude as a String
+			String temp = s.substring(u.length(), s.length()); //Get the magnitude as a String
 			//Now convert it into a number.
 			try{
 				float val = Float.parseFloat(temp);
@@ -257,7 +260,6 @@ public class NetworkThread extends Thread implements SerialPortEventListener{
 				return -1;
 			}
 		}
-		System.out.println("Garbage data");
 		return -1; //This should be caught and not be used to generate data
 	}
 
@@ -293,9 +295,18 @@ public class NetworkThread extends Thread implements SerialPortEventListener{
 					parse(inputLine); //Check if the com port message is on this line
 				}
 				if (foundcom == 1){ //We found the com port, so start reading the data in
-					float val = parseAndCrop(inputLine);
+					float val = parseAndCrop(inputLine, USTRING);
 					if (Math.abs(val + 1) < 0.01){
-						//val = -1, i.e. an error. Do nothing since error was already printed.
+						//val = -1, meaning not an arduts message. Could be an ACK, so check for that.
+						val = parseAndCrop(inputLine, ACKSTRING);
+						if (Math.abs(val + 1) < 0.01){
+							//val = -1, meaning error.
+							System.out.println("Garbage Data");
+						}
+						else {
+							ack = true;
+							System.out.println("ACK received with value " + val);
+						}
 					}
 					else{ //if value is valid, add it to the list
 						databuffer.addLast(new DataPoint(val, (System.currentTimeMillis() - starttime)/1000l));
@@ -329,7 +340,13 @@ public class NetworkThread extends Thread implements SerialPortEventListener{
 			try {
 				output.write(barray);
 				sleep(50);
-				
+				if (ack){
+					ack = false;
+					sendthreshold = false; //Only stop threshold flag if the send succeeded.
+				}
+				else {
+					System.out.println("No ACK received from Arduino");
+				}
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
 				System.out.println("Failed to write characters to Arduino");
@@ -358,6 +375,9 @@ public class NetworkThread extends Thread implements SerialPortEventListener{
 			}
 			if (reset && foundcom == 0){
 				startup();
+			}
+			if (sendthreshold){
+				sendThreshold();
 			}
 			try {
 				sleep(250); //Thread should sleep for 250 ms to match the c code. Can possibly be removed later, may not be necessary.
