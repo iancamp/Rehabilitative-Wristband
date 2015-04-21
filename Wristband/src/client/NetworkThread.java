@@ -5,6 +5,7 @@ import gnu.io.SerialPortEvent;
 import gnu.io.SerialPortEventListener;
 
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.util.Enumeration;
@@ -323,7 +324,16 @@ public class NetworkThread extends Thread implements SerialPortEventListener{
 	 */
 	private synchronized void sendThreshold(){
 		if (foundcom == 1 && !reset && !timeout){ //Check for flags. Do not attempt to send data if the device has any connection error.
-			
+			String tosend = Integer.toString(threshold);
+			byte[] barray = tosend.getBytes();
+			try {
+				output.write(barray);
+				sleep(50);
+				
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				System.out.println("Failed to write characters to Arduino");
+			}
 		}
 	}
 	
@@ -356,7 +366,7 @@ public class NetworkThread extends Thread implements SerialPortEventListener{
 				e.printStackTrace();
 			}
 			double temptime = (System.currentTimeMillis() - lastreceived)/1000;
-			if (foundcom == 1 && temptime > TIMEOUT_THRESHOLD){
+			if (foundcom == 1 && temptime > TIMEOUT_THRESHOLD && !randomon){
 				System.out.println("TIMEOUT AT: " + temptime);
 				timeout = true;
 				closePort();
