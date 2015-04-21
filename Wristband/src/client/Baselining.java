@@ -166,7 +166,7 @@ public class Baselining {
         long startTime = System.currentTimeMillis();
         while((System.currentTimeMillis()-startTime)< minutes*60*1000){
             session.updateData();}
-        session.threshold = (float)(session.baseline + ((session.max - session.baseline)*.7));
+        session.threshold = (int)(session.baseline + ((session.max - session.baseline)*.7));
         //learningPhase(minutes, phasecount, session.threshold);}
 
         /**

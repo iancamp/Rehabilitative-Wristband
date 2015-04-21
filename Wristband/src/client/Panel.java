@@ -1,6 +1,8 @@
 package client;
 
 import javax.swing.*;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 import javax.xml.crypto.Data;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -57,7 +59,19 @@ public class Panel extends JPanel{
         thresholdControl.setPaintTicks(true);
         thresholdControl.setPaintLabels(true);
 
-        /*Create button for Reload if Arduino Fails */
+        /* Add Listner for Slider to send data to Baseline on Slider Change */
+        ChangeListener SlideListener = new ChangeListener(){
+            public void stateChanged(ChangeEvent e) {
+                JSlider source = (JSlider)e.getSource();
+                if (!source.getValueIsAdjusting()) { //only true when threshold is recently changed
+                    baseline.setAllThresholds(thresholdControl.getValue());
+                }
+            }
+        };
+
+        thresholdControl.addChangeListener(SlideListener);
+
+        /* Create button for Reload if Arduino Fails */
         arduinoFail = new JButton("Retry");
         arduinoFail.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent evt) {
