@@ -37,6 +37,8 @@ public class NetworkThread extends Thread implements SerialPortEventListener{
 	private int foundcom; //0 if still initializing. -1 if com not found. 1 if com found.
 	private int attempts; //How many attempts the program will make in trying to find the comm port.
 	private boolean reset = false; //Whether or not we need to reset. True if reset is called for.
+	private int threshold = 0; //Current threshold that should be sent over
+	private boolean sendthreshold = false; //Whether or not the threshold needs to be sent and updated on the device.
 	/**
 	* A BufferedReader which will be fed by a InputStreamReader 
 	* converting the bytes into characters 
@@ -306,8 +308,23 @@ public class NetworkThread extends Thread implements SerialPortEventListener{
 		// Ignore all the other eventTypes, but you should consider the other ones.
 	}
 	
-	public synchronized void sendThreshold(){
-		
+	/**
+	 * This function should be called to set the threshold within NetworkThread and to make NetworkThread send
+	 * the threshold to the device.
+	 * @param threshold The new threshold value.
+	 */
+	public synchronized void setThreshold(int threshold){
+		this.threshold = threshold;
+		sendthreshold = true;
+	}
+	
+	/**
+	 * Attempts to send the threshold to the device. Will only function if the device is currently connected.
+	 */
+	private synchronized void sendThreshold(){
+		if (foundcom == 1 && !reset && !timeout){ //Check for flags. Do not attempt to send data if the device has any connection error.
+			
+		}
 	}
 	
 	
