@@ -16,7 +16,7 @@ public class Baselining {
     private NetworkThread wristbandInterface;
     //DataPoint newPoint;
     private float baseline;
-    private float threshold;
+    private int threshold;
     private float sum;
     private float max;
 
@@ -47,6 +47,17 @@ public class Baselining {
      */
     public float getBaseline(){
         return baseline;
+    }
+
+    /**
+     * Sets the Baselining object's threshold
+     * @param threshold Value, which user sets, that the patient must reach to activate the toy
+     */
+    public void setThreshold(int threshold){ this.threshold = threshold; }
+
+    public void setAllThresholds(int threshold){
+        setThreshold(threshold);
+        wristbandInterface.setThreshold(threshold);
     }
 
     /**
