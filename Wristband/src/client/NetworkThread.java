@@ -36,6 +36,7 @@ public class NetworkThread extends Thread implements SerialPortEventListener{
 	private SerialPort serialPort;
 	private int foundcom; //0 if still initializing. -1 if com not found. 1 if com found.
 	private int attempts; //How many attempts the program will make in trying to find the comm port.
+	private boolean reset = false; //Whether or not we need to reset. True if reset is called for.
 	/**
 	* A BufferedReader which will be fed by a InputStreamReader 
 	* converting the bytes into characters 
@@ -135,7 +136,7 @@ public class NetworkThread extends Thread implements SerialPortEventListener{
 	 */
 	public void restartFailedToConnect(){
 		if (foundcom == -1){
-			startup();
+			reset = true;
 		}
 	}
 	
@@ -145,7 +146,7 @@ public class NetworkThread extends Thread implements SerialPortEventListener{
 	public void restartTimeout(){
 		closePort();
 		timeout = false;
-		startup();
+		reset = true;
 	}
 	
 	/**
@@ -167,6 +168,7 @@ public class NetworkThread extends Thread implements SerialPortEventListener{
 
 				if (attemptCom(currPortId)){ //If the current comm port is the arduino
 					found=true;
+					reset = false;
 					System.out.println("SUCCESS!!!!");
 					break;
 				}
@@ -263,6 +265,7 @@ public class NetworkThread extends Thread implements SerialPortEventListener{
 		if (serialPort != null) {
 			serialPort.removeEventListener();
 			serialPort.close();
+			foundcom = 0;
 		}
 	}
 	
@@ -325,6 +328,9 @@ public class NetworkThread extends Thread implements SerialPortEventListener{
 			if (randomon){
 				DataPoint d = generateFakeData();
 				databuffer.addLast(d);
+			}
+			if (reset && foundcom == 0){
+				startup();
 			}
 			try {
 				sleep(250); //Thread should sleep for 250 ms to match the c code. Can possibly be removed later, may not be necessary.

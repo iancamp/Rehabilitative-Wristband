@@ -117,7 +117,7 @@ public class Panel extends JPanel{
 
         /*check for Ardiuno on startup */
         int foundCom = networkThread.getFoundCom();
-        if(foundCom == 0){ //still searching
+        if(foundCom == 0 && !networkThread.getTimeOut()){ //still searching
             g.drawString("Loading",(int) (.25 * getWidth()), (int) (.4 * getHeight()));
         }
         else if(foundCom < 0){ //failed
