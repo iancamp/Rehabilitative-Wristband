@@ -19,6 +19,9 @@ public class Panel extends JPanel{
     Baselining baseline;
     NetworkThread networkThread;
 
+    boolean inBaseline;
+    boolean inLearning;
+
     JButton baseliningButton;
     JButton learningButton;
     JButton summaryButton;
@@ -28,20 +31,88 @@ public class Panel extends JPanel{
     JButton arduinoFail;
     JButton arduinoTimeOut;
 
+    JButton pauseButton;
+    JButton cancelButton;
+
     int startingWidth = 800;
     int startingHeight = 600;
+
+    private void setAllInputsVisible(boolean visible){
+        timeControl.setVisible(visible);
+        baseliningButton.setVisible(visible);
+        learningButton.setVisible(visible);
+        thresholdControl.setVisible(visible);
+        summaryButton.setVisible(visible);
+    }
 
     public Panel(JFrame frame, Baselining baseline) {
         this.frame = frame;
         this.baseline = baseline;
         networkThread = baseline.getWristbandInterface();
+        inBaseline = false;
+        inLearning = false;
 
         timeControl = new JSpinner(new SpinnerNumberModel(2,.5,10,.5));
         timeControl.setFont(new Font("Courier New", Font.PLAIN, 20));
 
+        /* Create Baselining Phase Button & Implementation */
         baseliningButton = new JButton("Start Baselining Phase");
+        baseliningButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent evt) {
+                inBaseline = true;
+                setAllInputsVisible(false);
 
+                pauseButton.setVisible(true);
+                cancelButton.setVisible(true);
+
+                //TODO: collect data as Baselining Phase
+            }
+        });
+
+        /* Create Learning Phase Button & Implementation */
         learningButton = new JButton("Start Learning Phase");
+        learningButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent evt) {
+                inLearning = true;
+                setAllInputsVisible(false);
+
+                pauseButton.setVisible(true);
+                cancelButton.setVisible(true);
+
+                //TODO: collect data as Learning Phase
+            }
+        });
+
+        /* Create Pause Phase Button & Implementation */
+        pauseButton = new JButton("Pause");
+        pauseButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent evt) {
+                //TODO:Do stuff to stop incoming data.
+            }
+        });
+
+        /* Create Cancel Phase Button & Implementation */
+        cancelButton = new JButton("Cancel");
+        cancelButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent evt) {
+                int answer = JOptionPane.showConfirmDialog(
+                        frame,
+                        "Cancel current Phase. Are you Sure?",
+                        "Cancel Phase",
+                        JOptionPane.YES_NO_OPTION);
+
+                if(answer == 0){    //JOptionPane returns 0 when user selects Yes
+                    inLearning = false;
+                    inBaseline = false;
+
+                    pauseButton.setVisible(false);
+                    cancelButton.setVisible(false);
+                    setAllInputsVisible(true);
+
+                    //TODO: delete all recorded data
+                }
+            }
+        });
 
         /*Create Summary Button & Implementation for OnClick */
         summaryButton = new JButton("Summary");
@@ -99,6 +170,8 @@ public class Panel extends JPanel{
         this.add(thresholdControl);
         this.add(arduinoFail);
         this.add(arduinoTimeOut);
+        this.add(pauseButton);
+        this.add(cancelButton);
 
         frame.getContentPane().add(this);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -144,7 +217,12 @@ public class Panel extends JPanel{
             arduinoTimeOut.setBounds((int) (.25 * getWidth()), (int) (.55 * getHeight()), (int) (.35 * getWidth()), (int) (.13 * getHeight()));
             arduinoTimeOut.setVisible(true);
         }
-        else { //success
+        else if(inLearning || inBaseline){ //in a phase, collecting data
+            pauseButton.setBounds((int) (.05 * getWidth()), (int) (.1 * getHeight()), (int) (.42 * getWidth()), (int) (.1 * getHeight()));
+            cancelButton.setBounds((int) (.5 * getWidth()), (int) (.1 * getHeight()), (int) (.42 * getWidth()), (int) (.1 * getHeight()));
+
+            g.setFont(new Font("Courier New", Font.PLAIN, 20));
+            g.drawString("//TODO: display time remaining", (int) (.4 * this.getWidth()), (int) (.06 * this.getHeight()));
 
             LinkedList<DataPoint> values = baseline.getSessionData();
             g.setFont(new Font("Courier New", Font.PLAIN, 20));
@@ -170,8 +248,9 @@ public class Panel extends JPanel{
                 ), (int) (.01 * this.getWidth()), (int) (.45 * this.getHeight()) + y);
                 y += 20;
             }
-
-        /* Reset all buttons and inputs if window was resized */
+        }
+        else{
+            /* Reset all buttons and inputs if window was resized */
             timeControl.setBounds((int) (.2 * getWidth()), (int) (.02 * getHeight()), (int) (.6 * getWidth()), (int) (.07 * getHeight()));
             baseliningButton.setBounds((int) (.05 * getWidth()), (int) (.1 * getHeight()), (int) (.42 * getWidth()), (int) (.1 * getHeight()));
             learningButton.setBounds((int) (.5 * getWidth()), (int) (.1 * getHeight()), (int) (.42 * getWidth()), (int) (.1 * getHeight()));
