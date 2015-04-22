@@ -37,12 +37,14 @@ public class Panel extends JPanel{
     int startingWidth = 800;
     int startingHeight = 600;
 
-    private void setAllInputsVisible(boolean visible){
-        timeControl.setVisible(visible);
-        baseliningButton.setVisible(visible);
-        learningButton.setVisible(visible);
-        thresholdControl.setVisible(visible);
-        summaryButton.setVisible(visible);
+    private void toggleAllVisible(){
+        timeControl.setVisible(!timeControl.isVisible());
+        baseliningButton.setVisible(!baseliningButton.isVisible());
+        learningButton.setVisible(!learningButton.isVisible());
+        thresholdControl.setVisible(!thresholdControl.isVisible());
+        summaryButton.setVisible(!summaryButton.isVisible());
+        pauseButton.setVisible(!pauseButton.isVisible());
+        cancelButton.setVisible(!cancelButton.isVisible());
     }
 
     public Panel(JFrame frame, Baselining baseline) {
@@ -52,6 +54,7 @@ public class Panel extends JPanel{
         inBaseline = false;
         inLearning = false;
 
+        /* Create Spinner for control over the length of each phase */
         timeControl = new JSpinner(new SpinnerNumberModel(2,.5,10,.5));
         timeControl.setFont(new Font("Courier New", Font.PLAIN, 20));
 
@@ -60,10 +63,7 @@ public class Panel extends JPanel{
         baseliningButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent evt) {
                 inBaseline = true;
-                setAllInputsVisible(false);
-
-                pauseButton.setVisible(true);
-                cancelButton.setVisible(true);
+                toggleAllVisible();
 
                 //TODO: collect data as Baselining Phase
             }
@@ -74,10 +74,7 @@ public class Panel extends JPanel{
         learningButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent evt) {
                 inLearning = true;
-                setAllInputsVisible(false);
-
-                pauseButton.setVisible(true);
-                cancelButton.setVisible(true);
+                toggleAllVisible();
 
                 //TODO: collect data as Learning Phase
             }
@@ -85,6 +82,7 @@ public class Panel extends JPanel{
 
         /* Create Pause Phase Button & Implementation */
         pauseButton = new JButton("Pause");
+        pauseButton.setVisible(false);
         pauseButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent evt) {
                 //TODO:Do stuff to stop incoming data.
@@ -93,6 +91,7 @@ public class Panel extends JPanel{
 
         /* Create Cancel Phase Button & Implementation */
         cancelButton = new JButton("Cancel");
+        cancelButton.setVisible(false);
         cancelButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent evt) {
                 int answer = JOptionPane.showConfirmDialog(
@@ -105,9 +104,7 @@ public class Panel extends JPanel{
                     inLearning = false;
                     inBaseline = false;
 
-                    pauseButton.setVisible(false);
-                    cancelButton.setVisible(false);
-                    setAllInputsVisible(true);
+                    toggleAllVisible();
 
                     //TODO: delete all recorded data
                 }
@@ -116,10 +113,9 @@ public class Panel extends JPanel{
 
         /*Create Summary Button & Implementation for OnClick */
         summaryButton = new JButton("Summary");
-        final Baselining b2 = baseline;
         summaryButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent evt) {
-                new Summary(new JFrame(), b2);
+                new Summary(new JFrame(), baseline);
             }
         });
 
@@ -194,6 +190,29 @@ public class Panel extends JPanel{
     }
 
     /**
+     * getTimeString takes a double, which is the number of minutes remaining and converts it to a
+     * String of type: "Minutes:"Seconds".
+     * @param time
+     * @return
+     */
+    private String getTimeString(double time){
+        String output;
+        int minutes = (int)time; //cut of the seconds and only take the minutes
+        double seconds = (Math.abs(time-minutes)*100); //cut off the minutes and only take the seconds
+        seconds = seconds*3;
+        seconds = seconds/5;
+        int outputSeconds = (int)seconds;
+
+        if(outputSeconds>=10) {
+            output = minutes + ":" + outputSeconds;
+        }
+        else{
+            output = minutes + ":0" + outputSeconds;
+        }
+        return output;
+    }
+
+    /**
      * paint(Graphics g) is called repeatedly whenever possible to 
      * repaint the window until the user exits the window. Repaint can be 
      * called to force an update immediately.
@@ -221,33 +240,19 @@ public class Panel extends JPanel{
             pauseButton.setBounds((int) (.05 * getWidth()), (int) (.1 * getHeight()), (int) (.42 * getWidth()), (int) (.1 * getHeight()));
             cancelButton.setBounds((int) (.5 * getWidth()), (int) (.1 * getHeight()), (int) (.42 * getWidth()), (int) (.1 * getHeight()));
 
-            g.setFont(new Font("Courier New", Font.PLAIN, 20));
-            g.drawString("//TODO: display time remaining", (int) (.4 * this.getWidth()), (int) (.06 * this.getHeight()));
+            g.setFont(new Font("Courier New", Font.PLAIN, 26));
+            g.drawString(getTimeString((double)timeControl.getValue()), (int) (.42 * this.getWidth()), (int) (.06 * this.getHeight()));
 
-            LinkedList<DataPoint> values = baseline.getSessionData();
-            g.setFont(new Font("Courier New", Font.PLAIN, 20));
-            g.drawString("Data:", (int) (.06 * this.getWidth()), (int) (.4 * this.getHeight()));
-            g.drawString("Sum:", (int) (.25 * this.getWidth()), (int) (.4 * this.getHeight()));
-            //float sum = baseline.getSum();
-            g.drawString(baseline.getSum() + "", (int) (.4 * this.getWidth()), (int) (.4 * this.getHeight()) + 30); //need to append "" to make the float a String
-            g.drawString("Baseline:", (int) (.4 * this.getWidth()), (int) (.4 * this.getHeight()));
-            //float avg = baseline.getBaseline();
-            g.drawString(baseline.getBaseline() + "", (int) (.25 * this.getWidth()), (int) (.4 * this.getHeight()) + 30); //need to append "" to make the float a String
-            LinkedList<DataPoint> top20 = new LinkedList<DataPoint>();
-            for (int i = values.size() - 1; i > Math.max(0, values.size() - 20); i--) {
-                top20.add(values.get(i));
+            g.setFont(new Font("Courier New", Font.PLAIN, 30));
+            if(inBaseline){
+                g.drawString("Baselining Phase: Threshold = " + thresholdControl.getValue(),(int) (.045 * getWidth()), (int) (.26 * getHeight()));
             }
-            int y = 0;
-            for (DataPoint d : top20) {
-                //this.setForeground(Color.BLUE);
-                //g.setFont(g.getFont().setForeground(Color.BLUE));
-                g.drawString(String.format(
-                        "%7.2f: %5.2f",
-                        d.getTime(),
-                        Math.abs(d.getMagnitude())
-                ), (int) (.01 * this.getWidth()), (int) (.45 * this.getHeight()) + y);
-                y += 20;
+            else if(inLearning){
+                g.drawString("Learning Phase: Threshold = " + thresholdControl.getValue(),(int) (.045 * getWidth()), (int) (.26 * getHeight()));
             }
+
+            /*Display all incoming Data: */
+            displayAllData(g);
         }
         else{
             /* Reset all buttons and inputs if window was resized */
@@ -258,6 +263,37 @@ public class Panel extends JPanel{
             summaryButton.setBounds((int) (.65 * getWidth()), (int) (.35 * getHeight()), (int) (.25 * getWidth()), (int) (.08 * getHeight()));
             thresholdControl.setBounds((int) (.04 * getWidth()), (int) (.24 * getHeight()), (int) (.9 * getWidth()), (int) (.08 * getHeight()));
             revalidate();
+        }
+    }
+
+    /**
+     * displayAllData is called from the paint function. It prints all incoming data to the screen.
+     * @param g
+     */
+    private void displayAllData(Graphics g){
+        LinkedList<DataPoint> values = baseline.getSessionData();
+        g.setFont(new Font("Courier New", Font.PLAIN, 20));
+        g.drawString("Data:", (int) (.06 * this.getWidth()), (int) (.4 * this.getHeight()));
+        g.drawString("Sum:", (int) (.25 * this.getWidth()), (int) (.4 * this.getHeight()));
+        //float sum = baseline.getSum();
+        g.drawString(baseline.getSum() + "", (int) (.4 * this.getWidth()), (int) (.4 * this.getHeight()) + 30); //need to append "" to make the float a String
+        g.drawString("Baseline:", (int) (.4 * this.getWidth()), (int) (.4 * this.getHeight()));
+        //float avg = baseline.getBaseline();
+        g.drawString(baseline.getBaseline() + "", (int) (.25 * this.getWidth()), (int) (.4 * this.getHeight()) + 30); //need to append "" to make the float a String
+        LinkedList<DataPoint> top20 = new LinkedList<DataPoint>();
+        for (int i = values.size() - 1; i > Math.max(0, values.size() - 20); i--) {
+            top20.add(values.get(i));
+        }
+        int y = 0;
+        for (DataPoint d : top20) {
+            //this.setForeground(Color.BLUE);
+            //g.setFont(g.getFont().setForeground(Color.BLUE));
+            g.drawString(String.format(
+                    "%7.2f: %5.2f",
+                    d.getTime(),
+                    Math.abs(d.getMagnitude())
+            ), (int) (.01 * this.getWidth()), (int) (.45 * this.getHeight()) + y);
+            y += 20;
         }
     }
 
