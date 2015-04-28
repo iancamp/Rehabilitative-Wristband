@@ -19,6 +19,7 @@ public class Baselining {
     private int threshold;
     private float sum;
     private float max;
+    private double timerem;
 
     /**
      * Constructor to create a Baselining object
@@ -31,6 +32,7 @@ public class Baselining {
         baseline = 0;
         threshold = 0;
         max = 0;
+        timerem = 0;
     }
 
     /**
@@ -47,6 +49,14 @@ public class Baselining {
      */
     public float getBaseline(){
         return baseline;
+    }
+
+    /**
+     * Returns the time remaining in whatever phase it is currently in.
+     * @return The time remaining in whatever phase it is in.
+     */
+    public double getTimerem(){
+        return timerem;
     }
 
     /**
@@ -142,9 +152,8 @@ public class Baselining {
     }
 
     /**
-     * Makes a list of strings depicting high, medium, or low movement
+     * Adds a himedlo String to each DataPoint based on its magnitude
      * @param Baseline data
-     * @return List of strings [high, medium, or low]
      */
     public void himedlo(LinkedList<DataPoint> data){
         for(DataPoint currentpoint : data){
@@ -155,26 +164,42 @@ public class Baselining {
 
     /**
      * Updates data for an amount of time and computes threshold
-     * @param number of minutes and how many subsequent learning phases
+     * @param number of minutes, how long the learning phase will be, and the threshold for the learning phase
      */
-    public void baselinePhase(double minutes, int phasecount){
+    public void baselinePhase(double minutes, double learningtime, double threshold){
         Baselining session = new Baselining();
         LinkedList<DataPoint> tempdata = new LinkedList<DataPoint>();
         session.wristbandInterface.copyFromQueue(tempdata);
+        long timeinphase = (long) (minutes*60*1000);
+        double timerem = (long) minutes;
         long startTime = System.currentTimeMillis();
-        while((System.currentTimeMillis()-startTime)< minutes*60*1000){
-            session.updateData();}
-        session.threshold = (int)(session.baseline + ((session.max - session.baseline)*.7));
-        //learningPhase(minutes, phasecount, session.threshold);}
+        while((System.currentTimeMillis()-startTime)< timeinphase){
+            timerem =  (minutes - ((System.currentTimeMillis() - startTime)/timeinphase));
+            session.updateData();
+        }
+        int phasecount = (int) Math.ceil(learningtime/minutes);
+        //learningPhase(minutes, phasecount, threshold);
+    }
 
-        /**
-         * Calculates the current baseline
-         * @param magnitude
-         */
+    /**
+     * Activates toy when movement exceeds threshold.  Also increases threshold when hit too many times.
+     * @param minutes for each learningphase, number of phases, and current threshold
+     */
+    public void learningPhase(double minutes, int phasecount, double threshold) {
+        while (phasecount != 0) {
+
+        }
+    }
+
+    /**
+     * Calculates the current baseline
+     * @param magnitude
+     */
     /*public void changeBaseline(float magnitude){
         sum += magnitude;
         baseline = sum/sessionData.size();
     }*/
 
-    }}
+}
  
+
