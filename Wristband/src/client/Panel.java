@@ -249,7 +249,8 @@ public class Panel extends JPanel{
             cancelButton.setBounds((int) (.5 * getWidth()), (int) (.1 * getHeight()), (int) (.42 * getWidth()), (int) (.1 * getHeight()));
 
             g.setFont(new Font("Courier New", Font.PLAIN, 26));
-           // g.drawString(getTimeString(timeControl.getValue()), (int) (.42 * this.getWidth()), (int) (.06 * this.getHeight()));
+            Double t = (Double)(timeControl.getValue());
+            g.drawString(getTimeString(t), (int) (.42 * this.getWidth()), (int) (.06 * this.getHeight()));
 
             g.setFont(new Font("Courier New", Font.PLAIN, 30));
             if(inBaseline){
