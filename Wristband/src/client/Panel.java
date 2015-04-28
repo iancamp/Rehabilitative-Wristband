@@ -95,7 +95,7 @@ public class Panel extends JPanel{
         cancelButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent evt) {
                 int answer = JOptionPane.showConfirmDialog(
-                        frame,
+                        getFrame(),
                         "Cancel current Phase. Are you Sure?",
                         "Cancel Phase",
                         JOptionPane.YES_NO_OPTION);
@@ -115,7 +115,7 @@ public class Panel extends JPanel{
         summaryButton = new JButton("Summary");
         summaryButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent evt) {
-                new Summary(new JFrame(), baseline);
+                new Summary(new JFrame(), getBaseline());
             }
         });
 
@@ -131,7 +131,7 @@ public class Panel extends JPanel{
             public void stateChanged(ChangeEvent e) {
                 JSlider source = (JSlider)e.getSource();
                 if (!source.getValueIsAdjusting()) { //only true when threshold is recently changed
-                    baseline.setAllThresholds(thresholdControl.getValue());
+                    getBaseline().setAllThresholds(thresholdControl.getValue());
                 }
             }
         };
@@ -189,6 +189,14 @@ public class Panel extends JPanel{
         });
     }
 
+    private final JFrame getFrame(){
+        return frame;
+    }
+
+    private final Baselining getBaseline(){
+        return baseline;
+    }
+
     /**
      * getTimeString takes a double, which is the number of minutes remaining and converts it to a
      * String of type: "Minutes:"Seconds".
@@ -241,7 +249,7 @@ public class Panel extends JPanel{
             cancelButton.setBounds((int) (.5 * getWidth()), (int) (.1 * getHeight()), (int) (.42 * getWidth()), (int) (.1 * getHeight()));
 
             g.setFont(new Font("Courier New", Font.PLAIN, 26));
-            g.drawString(getTimeString((double)timeControl.getValue()), (int) (.42 * this.getWidth()), (int) (.06 * this.getHeight()));
+           // g.drawString(getTimeString(timeControl.getValue()), (int) (.42 * this.getWidth()), (int) (.06 * this.getHeight()));
 
             g.setFont(new Font("Courier New", Font.PLAIN, 30));
             if(inBaseline){
