@@ -146,14 +146,12 @@ public class Baselining {
      * @param Baseline data
      * @return List of strings [high, medium, or low]
      */
-    public LinkedList<String> himedlo(LinkedList<DataPoint> data){
-        LinkedList<String> himedlo = new LinkedList<String>();
+    public void himedlo(LinkedList<DataPoint> data){
         for(DataPoint currentpoint : data){
-            if(currentpoint.getMagnitude() <= (.25*max)){himedlo.add("Low");}
-            else if(currentpoint.getMagnitude() <= (.75 * max)){himedlo.add("Medium");}
-            else{himedlo.add("High");}
-        }
-        return himedlo;}
+            if(currentpoint.getMagnitude() <= (.25*max)){currentpoint.himedlo = "Low";}
+            else if(currentpoint.getMagnitude() <= (.75 * max)){currentpoint.himedlo = "Medium";}
+            else{currentpoint.himedlo = "High";}
+        }}
 
     /**
      * Updates data for an amount of time and computes threshold

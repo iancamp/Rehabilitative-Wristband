@@ -8,6 +8,7 @@ package client;
 public class DataPoint implements Comparable{
 	private float magnitude;
 	private double time;
+	String himedlo;
 	
 	/**
 	 * Creates a DataPoint object to hold data as it comes in.
@@ -17,6 +18,7 @@ public class DataPoint implements Comparable{
 	public DataPoint(float magnitude,double time) {
 		this.magnitude = magnitude;
 		this.time = time;
+		this.himedlo = "";
 	}
 
 	/**

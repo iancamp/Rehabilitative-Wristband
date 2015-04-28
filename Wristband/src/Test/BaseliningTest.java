@@ -13,7 +13,8 @@ import static junit.framework.Assert.assertEquals;
 public class BaseliningTest extends Baselining {
 
     public static void main(String[] args) {
-        public void testupdateSum() {
+
+       /** public void testupdateSum() {
             Baselining test = new Baselining();
             test.getSessionData().add(new DataPoint(2, 1));
             test.getSessionData().add(new DataPoint(4, 2));
@@ -26,6 +27,6 @@ public class BaseliningTest extends Baselining {
         }
 
 
-}
+}*/
 
 }
