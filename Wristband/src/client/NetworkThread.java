@@ -73,6 +73,13 @@ public class NetworkThread extends Thread implements SerialPortEventListener{
 	}
 	
 	/**
+	 * Resets the starttime variable. Necessary to ensure that time=0 is when the experiment actually starts.
+	 */
+	public void resetTime(){
+		starttime = System.currentTimeMillis();
+	}
+	
+	/**
 	 * Returns the timeout value. If true, the device has stopped sending data to the application.
 	 * @return Returns true if the device has stopped responding. Otherwise returns false.
 	 */
@@ -215,7 +222,8 @@ public class NetworkThread extends Thread implements SerialPortEventListener{
 			// add event listeners
 			serialPort.addEventListener(this);
 			serialPort.notifyOnDataAvailable(true);
-			Thread.sleep(searchtimeout); //Sleep for 300 MS to see if the message we wanted came through.
+			sleep(searchtimeout);//Wait for timeout period for a response.
+			
 			if (foundcom == 1){
 				return true;
 			}
@@ -310,7 +318,7 @@ public class NetworkThread extends Thread implements SerialPortEventListener{
 					}
 					else{ //if value is valid, add it to the list
 						databuffer.addLast(new DataPoint(val, (System.currentTimeMillis() - starttime)/1000l));
-						System.out.println("VALUE: " + val);
+						//System.out.println("VALUE: " + val);
 					}
 				}
 			} catch (Exception e) {
@@ -333,23 +341,30 @@ public class NetworkThread extends Thread implements SerialPortEventListener{
 	/**
 	 * Attempts to send the threshold to the device. Will only function if the device is currently connected.
 	 */
-	private synchronized void sendThreshold(){
+	private void sendThreshold(){
 		if (foundcom == 1 && !reset && !timeout){ //Check for flags. Do not attempt to send data if the device has any connection error.
-			String tosend = Integer.toString(threshold);
+			System.out.println("TRYING TO SEND: "+threshold);
+			String tosend = Integer.toString(threshold) +'\n';
 			byte[] barray = tosend.getBytes();
 			try {
 				output.write(barray);
-				sleep(50);
-				if (ack){
-					ack = false;
-					sendthreshold = false; //Only stop threshold flag if the send succeeded.
-				}
-				else {
-					System.out.println("No ACK received from Arduino");
-				}
-			} catch (Exception e) {
-				// TODO Auto-generated catch block
+			} catch (Exception e){
 				System.out.println("Failed to write characters to Arduino");
+			}
+			double curtime = System.currentTimeMillis();
+			try {
+				sleep(300); //Wait 300 ms for a response
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+
+			if (ack){
+				ack = false;
+				sendthreshold = false; //Only stop threshold flag if the send succeeded.
+			}
+			else {
+				System.out.println("No ACK received from Arduino");
 			}
 		}
 	}
@@ -373,7 +388,7 @@ public class NetworkThread extends Thread implements SerialPortEventListener{
 				DataPoint d = generateFakeData();
 				databuffer.addLast(d);
 			}
-			if (reset && foundcom == 0){
+			if (reset && foundcom != 1){
 				startup();
 			}
 			if (sendthreshold){
