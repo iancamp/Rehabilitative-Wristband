@@ -63,6 +63,7 @@ public class Panel extends JPanel{
         baseliningButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent evt) {
                 inBaseline = true;
+                thresholdControl.setValue(100); //set threshold very high to stop toy from activing during baseline
                 toggleAllVisible();
 
                 //TODO: collect data as Baselining Phase
@@ -120,7 +121,7 @@ public class Panel extends JPanel{
         });
 
         /* Create Slider for adjusting Threshold */
-        thresholdControl = new JSlider(JSlider.HORIZONTAL,0,100,50);
+        thresholdControl = new JSlider(JSlider.HORIZONTAL,0,100,100); //set default very high to match arduino's default
         thresholdControl.setMajorTickSpacing(10);
         thresholdControl.setMinorTickSpacing(1);
         thresholdControl.setPaintTicks(true);
