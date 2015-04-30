@@ -64,6 +64,7 @@ void loop()
     }
   }
   
+  
   while (Serial.available() > 0) {
     int inchar = Serial.read();
     if (isDigit(inchar) && inchar != '\n') {
@@ -75,6 +76,8 @@ void loop()
       input = ""; //Reset input String
     }
   }
+  
+  
 
 
 }

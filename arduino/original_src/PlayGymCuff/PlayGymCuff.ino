@@ -8,7 +8,7 @@ uno controlling the play gym toys
 */
 
 #include <SoftwareSerial.h>
-#include <AcceleroMMA7361.h>
+#include "AcceleroMMA7361.h"
 
 // XBee's DOUT (TX) is connected to pin 2 (Arduino's Software RX)
 // XBee's DIN (RX) is connected to pin 3 (Arduino's Software TX)

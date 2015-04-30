@@ -1,4 +1,4 @@
-s/*
+/*
 University of Delaware Senior Design Team F
 Andrew Sieben, Kaitlyn Turek, Kristi Jackson, Amanda Morrison, Jie Ma
 Last Updated: 12/9/2014 By Andrew Sieben
