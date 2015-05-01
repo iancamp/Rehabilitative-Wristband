@@ -149,6 +149,7 @@ public class Baselining {
             baseline = sum/(baselineData.size() - outliers);
             timerem =  (minutes - ((System.currentTimeMillis() - startTime)/timeinphase));
         }
+        else{startBaseline = false;}
 
 
 
@@ -174,6 +175,7 @@ public class Baselining {
      */
     public void baselinePhase(double minutes){
         wristbandInterface.resetTime();
+        startBaseline = true;
         timeinphase = (minutes*60*1000);
         timerem = minutes;
         startTime = System.currentTimeMillis();
