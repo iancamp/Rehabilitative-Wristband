@@ -150,6 +150,7 @@ public class NetworkThread extends Thread implements SerialPortEventListener{
 		if (foundcom == -1){
 			reset = true;
 		}
+		foundcom = 0;
 	}
 	
 	/**
@@ -180,7 +181,6 @@ public class NetworkThread extends Thread implements SerialPortEventListener{
 
 				if (attemptCom(currPortId)){ //If the current comm port is the arduino
 					found=true;
-					reset = false;
 					System.out.println("SUCCESS!!!!");
 					break;
 				}
@@ -196,6 +196,7 @@ public class NetworkThread extends Thread implements SerialPortEventListener{
 			foundcom = -1;
 			return;
 		}
+		reset = false;
 	}
 	
 	/**
