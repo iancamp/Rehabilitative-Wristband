@@ -264,6 +264,12 @@ public class Panel extends JPanel{
                 g.drawString("Learning Phase: Threshold = " + thresholdControl.getValue(),(int) (.045 * getWidth()), (int) (.26 * getHeight()));
             }
 
+            if(!baseline.getstartBaseline()){
+                inBaseline = false;
+                inLearning = false;
+                toggleAllVisible();
+            }
+
             /*Display all incoming Data: */
             displayAllData(g);
         }
