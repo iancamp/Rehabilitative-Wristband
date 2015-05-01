@@ -176,6 +176,7 @@ public class Baselining {
     public void baselinePhase(double minutes){
         wristbandInterface.resetTime();
         startBaseline = true;
+        this.minutes = minutes;
         timeinphase = (minutes*60*1000);
         timerem = minutes;
         startTime = System.currentTimeMillis();
