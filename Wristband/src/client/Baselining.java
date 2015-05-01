@@ -93,6 +93,10 @@ public class Baselining {
         return baselineData.getLast();
     }
 
+    public boolean getstartBaseline(){
+        return startBaseline;
+    }
+
 
 
     /**
@@ -147,7 +151,7 @@ public class Baselining {
             updateSumMax(temporaryNewData);
             baselineData.addAll(temporaryNewData);
             baseline = sum/(baselineData.size() - outliers);
-            timerem =  (minutes - ((System.currentTimeMillis() - startTime)/timeinphase));
+            timerem =  (minutes - ((System.currentTimeMillis() - startTime)/60000.0));
         }
         else{startBaseline = false;}
 
