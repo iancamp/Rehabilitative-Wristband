@@ -63,8 +63,10 @@ public class Panel extends JPanel{
         baseliningButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent evt) {
                 inBaseline = true;
-                thresholdControl.setValue(100); //set threshold very high to stop toy from activing during baseline
+                getBaseline().setAllThresholds(999); //set threshold very high to stop toy from activing during baseline
                 toggleAllVisible();
+
+                getBaseline().baselinePhase((Double)(timeControl.getValue()));
 
                 //TODO: collect data as Baselining Phase
             }
@@ -197,6 +199,9 @@ public class Panel extends JPanel{
     private final Baselining getBaseline(){
         return baseline;
     }
+    private void setBaseline(Baselining b){
+        baseline = b;
+    }
 
     /**
      * getTimeString takes a double, which is the number of minutes remaining and converts it to a
@@ -233,7 +238,8 @@ public class Panel extends JPanel{
         /*check for Ardiuno on startup */
         int foundCom = networkThread.getFoundCom();
         if(foundCom == 0 && !networkThread.getTimeOut()){ //still searching
-            g.drawString("Loading",(int) (.25 * getWidth()), (int) (.4 * getHeight()));
+            g.setFont(new Font("Times New Roman", Font.PLAIN, 40));
+            g.drawString("Loading...", (int) (.25 * getWidth()), (int) (.4 * getHeight()));
         }
         else if(foundCom < 0){ //failed
             g.setFont(new Font("Times New Roman", Font.BOLD, 50));
@@ -251,13 +257,10 @@ public class Panel extends JPanel{
 
             g.setFont(new Font("Courier New", Font.PLAIN, 26));
             Double t = (Double)(timeControl.getValue());
-            g.drawString(getTimeString(t), (int) (.42 * this.getWidth()), (int) (.06 * this.getHeight()));
+            g.drawString(getTimeString(baseline.getTimerem()), (int) (.42 * this.getWidth()), (int) (.06 * this.getHeight()));
 
             g.setFont(new Font("Courier New", Font.PLAIN, 30));
-            if(inBaseline){
-                g.drawString("Baselining Phase: Threshold = " + thresholdControl.getValue(),(int) (.045 * getWidth()), (int) (.26 * getHeight()));
-            }
-            else if(inLearning){
+            if(inLearning){
                 g.drawString("Learning Phase: Threshold = " + thresholdControl.getValue(),(int) (.045 * getWidth()), (int) (.26 * getHeight()));
             }
 
@@ -281,7 +284,7 @@ public class Panel extends JPanel{
      * @param g
      */
     private void displayAllData(Graphics g){
-        LinkedList<DataPoint> values = baseline.getSessionData();
+        LinkedList<DataPoint> values = baseline.getbaselineData();
         g.setFont(new Font("Courier New", Font.PLAIN, 20));
         g.drawString("Data:", (int) (.06 * this.getWidth()), (int) (.4 * this.getHeight()));
         g.drawString("Sum:", (int) (.25 * this.getWidth()), (int) (.4 * this.getHeight()));

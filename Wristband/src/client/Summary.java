@@ -2,6 +2,10 @@ package client;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 
 /**
  * Created by Henry on 4/15/2015.
@@ -10,12 +14,36 @@ public class Summary extends JPanel {
     JFrame frame;
     Baselining baseline;
 
+    JButton saveButton;
+
     int startingWidth = 600;
     int startingHeight = 400;
+
+    private JFrame getFrame(){
+        return frame;
+    }
 
     public Summary(JFrame frame, Baselining baseline){
         this.frame = frame;
         this.baseline = baseline;
+
+        saveButton = new JButton("Save Data");
+        saveButton.setVisible(true);
+        saveButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent evt) {
+                String name = (String)JOptionPane.showInputDialog(
+                        getFrame(),
+                        "Input the Baby's name\n"
+                                + "To be saved in the export file.",
+                        "Baby's Name Input",
+                        JOptionPane.PLAIN_MESSAGE,
+                        null,
+                        null,
+                        "Name");
+            }
+        });
+
+        //this.add(saveButton);
 
         frame.getContentPane().add(this);
         frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
@@ -30,13 +58,17 @@ public class Summary extends JPanel {
     @Override
     public void paint (Graphics g) {
         g.setFont(new Font("Courier New", Font.BOLD, 22));
-        g.drawString("Low",(int)(.1*getWidth()),(int)(.1*getHeight()));
-        g.drawString("Medium", (int)(.25*getWidth()),(int) (.1 * getHeight()));
-        g.drawString("High",(int)(.45*getWidth()),(int)(.1*getHeight()));
-        g.drawString("Baseline",(int)(.6*getWidth()),(int)(.1*getHeight()));
+        g.drawString("Low",(int)(.1*getWidth()),(int)(.3*getHeight()));
+        g.drawString("Medium", (int)(.25*getWidth()),(int) (.3 * getHeight()));
+        g.drawString("High", (int)(.45*getWidth()),(int) (.3 * getHeight()));
+        g.drawString("Baseline",(int)(.6*getWidth()),(int)(.3*getHeight()));
+
+        saveButton.setBounds((int)(this.getWidth()*.1),(int)(this.getHeight()*.05),(int)(this.getWidth()*.25),(int)(this.getHeight()*.1));
 
         g.setFont(new Font("Courier New", Font.PLAIN, 20));
 
-        g.drawString(baseline.getSum()+"", (int)(.62*this.getWidth()), (int)(.15*this.getHeight())+30);
+        g.drawString(baseline.getSum()+"", (int)(.62*this.getWidth()), (int)(.35*this.getHeight())+30);
+
+        revalidate();
     }
 }
