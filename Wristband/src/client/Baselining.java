@@ -20,6 +20,7 @@ public class Baselining {
     private float sum;
     private float max;
     private double timerem;
+    private int outliers;
 
     /**
      * Constructor to create a Baselining object
@@ -33,6 +34,7 @@ public class Baselining {
         threshold = 0;
         max = 0;
         timerem = 0;
+        outliers = 0;
     }
 
     /**
@@ -122,7 +124,10 @@ public class Baselining {
     public void updateSumMax(LinkedList<DataPoint> list){
         for(DataPoint currentPoint:list){
             if(max < currentPoint.getMagnitude()){max = currentPoint.getMagnitude();}
-            sum += currentPoint.getMagnitude();
+            if(currentPoint.getMagnitude() < 15.0){
+                outliers++;
+            }
+            else{sum += currentPoint.getMagnitude();}
         }
     }
 
@@ -147,7 +152,7 @@ public class Baselining {
         updateSumMax(temporaryNewData);
 
         sessionData.addAll(temporaryNewData);
-        baseline = sum/sessionData.size();
+        baseline = sum/(sessionData.size() - outliers);
 
     }
 
@@ -165,20 +170,21 @@ public class Baselining {
     /**
      * Updates data for an amount of time and computes threshold
      * @param number of minutes, how long the learning phase will be, and the threshold for the learning phase
+     * @return The baselining for the phase
      */
-    public void baselinePhase(double minutes, double learningtime, double threshold){
+    public Baselining baselinePhase(double minutes){
+        wristbandInterface.resetTime();
         Baselining session = new Baselining();
         LinkedList<DataPoint> tempdata = new LinkedList<DataPoint>();
         session.wristbandInterface.copyFromQueue(tempdata);
         long timeinphase = (long) (minutes*60*1000);
-        double timerem = (long) minutes;
+        timerem = (long) minutes;
         long startTime = System.currentTimeMillis();
         while((System.currentTimeMillis()-startTime)< timeinphase){
             timerem =  (minutes - ((System.currentTimeMillis() - startTime)/timeinphase));
             session.updateData();
         }
-        int phasecount = (int) Math.ceil(learningtime/minutes);
-        //learningPhase(minutes, phasecount, threshold);
+        return session;
     }
 
     /**
