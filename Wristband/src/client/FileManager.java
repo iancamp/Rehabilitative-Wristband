@@ -66,7 +66,7 @@ public final class FileManager{
 	*@param id The id of the baby which will be a part of the file name
 	*@return fileName A filename matching the above format
 	*/
-	private static String generateFileName(String id){
+	public static String generateFileName(String id){
 		DateFormat dateFmt = new SimpleDateFormat("_yyyy-MM-dd_HH-mm");
 		Date date = new Date();
 		

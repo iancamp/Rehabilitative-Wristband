@@ -111,7 +111,7 @@ public class Baselining {
      * Use to create a baselining object for testing purposes
      * @return A Baselining object used in tests
      */
-    public static Baselining generateTestBasline(){
+    public static Baselining generateTestBaseline(){
         Baselining testBaseline = new Baselining();
         testBaseline.baselineData.add(new DataPoint(1,1));
         testBaseline.baselineData.add(new DataPoint(2,2));
