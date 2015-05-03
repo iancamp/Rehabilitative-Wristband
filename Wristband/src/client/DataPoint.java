@@ -8,7 +8,7 @@ package client;
 public class DataPoint implements Comparable{
 	private float magnitude;
 	private double time;
-	String himedlo;
+	private String movement; //previously himedlo
 	
 	/**
 	 * Creates a DataPoint object to hold data as it comes in.
@@ -18,8 +18,25 @@ public class DataPoint implements Comparable{
 	public DataPoint(float magnitude,double time) {
 		this.magnitude = magnitude;
 		this.time = time;
-		this.himedlo = "";
+		this.movement = "";
 	}
+
+	/**
+	* Getter for the movement value
+	* @return Returns the string corresponding to the movement (high,medium,low)
+	*/
+	public String getMovement(){
+		return movement;
+	}
+	
+	/**
+	* Setter for the movement value
+	* @param movement The new movement value
+	*/
+	public void setMovement(String movement){
+		this.movement = movement;
+	}
+
 
 	/**
 	 * Returns the magnitude value.
@@ -67,8 +84,6 @@ public class DataPoint implements Comparable{
 		}
 		return 0;
 	}
-	
-	
-	
+
 	
 }
