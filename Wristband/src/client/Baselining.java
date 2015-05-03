@@ -67,6 +67,14 @@ public class Baselining {
     public double getTimerem(){
         return timerem;
     }
+    
+    /**
+     * Gets the current threshold
+     * @return The current threshold
+     */
+     public int get Threshold(){
+         return threshold;
+     }
 
     /**
      * Sets the Baselining object's threshold
