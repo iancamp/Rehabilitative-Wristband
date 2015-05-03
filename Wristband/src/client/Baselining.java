@@ -72,7 +72,7 @@ public class Baselining {
      * Gets the current threshold
      * @return The current threshold
      */
-     public int get Threshold(){
+     public int getThreshold(){
          return threshold;
      }
 
