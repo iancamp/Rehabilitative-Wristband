@@ -162,14 +162,14 @@ public class Baselining {
     }
 
     /**
-     * Adds a himedlo String to each DataPoint based on its magnitude
+     * Adds a movement String to each DataPoint based on its magnitude
      * @param Baseline data
      */
-    public void himedlo(LinkedList<DataPoint> data){
+    public void movement(LinkedList<DataPoint> data){
         for(DataPoint currentpoint : data){
-            if(currentpoint.getMagnitude() <= 15.0){currentpoint.himedlo = "Low";}
-            else if(15.0 < currentpoint.getMagnitude() && currentpoint.getMagnitude() <= threshold){currentpoint.himedlo = "Medium";}
-            else if(currentpoint.getMagnitude() > threshold){currentpoint.himedlo = "High";}
+            if(currentpoint.getMagnitude() <= 15.0){currentpoint.setMovement("Low");}
+            else if(15.0 < currentpoint.getMagnitude() && currentpoint.getMagnitude() <= threshold){currentpoint.setMovement("Medium");}
+            else if(currentpoint.getMagnitude() > threshold){currentpoint.setMovement("High");}
         }}
 
     /**
