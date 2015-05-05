@@ -84,6 +84,16 @@ public class DataPoint implements Comparable{
 		}
 		return 0;
 	}
+	
+	/**
+	 * Prints a DataPoint in a meaningful way
+	 * @param d The datapoint to represent as a string
+	 * @return The string representing the DataPoint ("<time,magnitude,movement>")
+	 * @Override
+	 */
+	public String toString(){
+		return "<" + this.getTime() + "," + this.getMagnitude() + "," + this.getMovement() + ">";
+	}
 
 	
 }
