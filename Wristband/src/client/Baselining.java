@@ -227,8 +227,8 @@ public class Baselining {
         LinkedList<DataPoint> emptytrash = new LinkedList<DataPoint>();
         wristbandInterface.copyFromQueue(emptytrash);
         startLearning = true;
-        learnphases = (int) Math.ceil(minutes / 3);
-        this.minutes = Math.ceil(minutes / learnphases);
+        learnphases = 3;
+        this.minutes = (minutes / learnphases);
         timeinphase = (minutes * 60 * 1000);
         timerem = minutes;
         phasenum = 0;
