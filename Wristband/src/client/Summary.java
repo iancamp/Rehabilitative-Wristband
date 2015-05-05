@@ -85,6 +85,7 @@ public class Summary extends JPanel {
 
     @Override
     public void paint (Graphics g) {
+    	super.paint(g);
         g.setFont(new Font("Courier New", Font.BOLD, 22));
         g.drawString("Low",(int)(.1*getWidth()),(int)(.3*getHeight()));
         g.drawString("Medium", (int) (.25 * getWidth()),(int) (.3 * getHeight()));
