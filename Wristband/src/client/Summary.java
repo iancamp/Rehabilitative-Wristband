@@ -30,6 +30,7 @@ public class Summary extends JPanel {
     public Summary(JFrame frame, Baselining baseline){
         this.frame = frame;
         this.baseline = baseline;
+
         windowOpen = true;
 
         saveButton = new JButton("Save Data");
@@ -40,7 +41,7 @@ public class Summary extends JPanel {
                         getFrame(),
                         "Input the Baby's ID\n"
                                 + "To be saved in the export file.",
-                        "Baby's Name Input",
+                        "Baby's ID Input",
                         JOptionPane.PLAIN_MESSAGE,
                         null,
                         null,
@@ -54,6 +55,7 @@ public class Summary extends JPanel {
             }
         });
 
+        this.setLayout(null);
         this.add(saveButton);
 
         frame.getContentPane().add(this);
@@ -89,7 +91,7 @@ public class Summary extends JPanel {
         g.drawString("High", (int)(.45*getWidth()),(int) (.3 * getHeight()));
         g.drawString("Baseline",(int)(.6*getWidth()),(int)(.3*getHeight()));
 
-        //saveButton.setBounds((int)(this.getWidth()*.12),(int)(this.getHeight()*.08),(int)(this.getWidth()*.25),(int)(this.getHeight()*.12));
+        saveButton.setBounds((int)(this.getWidth()*.12),(int)(this.getHeight()*.05),(int)(this.getWidth()*.30),(int)(this.getHeight()*.15));
 
         g.setFont(new Font("Courier New", Font.PLAIN, 20));
 
