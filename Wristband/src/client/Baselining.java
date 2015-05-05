@@ -27,6 +27,7 @@ public class Baselining {
     private double timeinphase;
     private double minutes;
     private int learnphases;
+    private int phasenum;
 
 
     /**
@@ -81,6 +82,11 @@ public class Baselining {
     public void setStartLearning(boolean thing) {
         startLearning = thing;
     }
+
+    public boolean getStartLearning(){
+        return startLearning;
+    }
+
 
     /**
      * Returns the time remaining in whatever phase it is currently in.
@@ -158,6 +164,7 @@ public class Baselining {
             } else {
                 sum += currentPoint.getMagnitude();
             }
+            movementBase(currentPoint);
         }
     }
 
@@ -178,26 +185,19 @@ public class Baselining {
         LinkedList<DataPoint> temporaryNewData = new LinkedList<DataPoint>();
         wristbandInterface.copyFromQueue(temporaryNewData);
         if (startBaseline && ((System.currentTimeMillis() - startTime) < timeinphase)) {
-            if (!garbage) {
-                garbage = true;
-            } else {
                 updateSumMax(temporaryNewData);
                 baselineData.addAll(temporaryNewData);
                 baseline = sum / (baselineData.size() - outliers);
-                timerem = (minutes - ((System.currentTimeMillis() - startTime) / 60000.0));
-            }
-        } else if (startLearning && ((System.currentTimeMillis() - startTime) < timeinphase) && learnphases > 0) {
-            if (!garbage) {
-                garbage = true;
-            } else {
+                timerem = (minutes - ((System.currentTimeMillis() - startTime) / 60000.0));}
+        else{startBaseline=false;}
+
+        if (startLearning && ((System.currentTimeMillis() - startTime) < timeinphase) && phasenum < learnphases) {
                 for (DataPoint currentpoint : temporaryNewData) {
-                    if (currentpoint.getMagnitude() >= threshold) {
-                    }
-                }
-            }
+                   movementLearn(currentpoint, phasenum);}
             learningData.addAll(temporaryNewData);
-        }
-    }
+            timerem = (minutes - ((System.currentTimeMillis() - startTime) / 60000.0));
+        if(timerem < 0){resetlearn();}}
+        else{startLearning=false;}}
 
 
     /**
@@ -227,10 +227,11 @@ public class Baselining {
         LinkedList<DataPoint> emptytrash = new LinkedList<DataPoint>();
         wristbandInterface.copyFromQueue(emptytrash);
         startLearning = true;
-        learnphases = (int) Math.ceil(minutes / 3);
-        this.minutes = Math.ceil(minutes / learnphases);
+        learnphases = 3;
+        this.minutes = (minutes / learnphases);
         timeinphase = (minutes * 60 * 1000);
         timerem = minutes;
+        phasenum = 0;
         startTime = System.currentTimeMillis();
     }
 
@@ -238,8 +239,8 @@ public class Baselining {
      * Resets learning upon time hitting 0
      */
     public void resetlearn(){
-        learningData = new LinkedList<DataPoint>();
-        learnphases--;
+        phasenum++;
+        timerem = minutes;
         startTime = System.currentTimeMillis();
     }
 
@@ -249,8 +250,7 @@ public class Baselining {
      *
      * @param Baseline data
      */
-    public void movement(LinkedList<DataPoint> data) {
-        for (DataPoint currentpoint : data) {
+    public void movementBase(DataPoint currentpoint) {
             if (currentpoint.getMagnitude() <= 15.0) {
                 currentpoint.setMovement("Low");
             } else if (15.0 < currentpoint.getMagnitude() && currentpoint.getMagnitude() <= threshold) {
@@ -258,7 +258,23 @@ public class Baselining {
             } else if (currentpoint.getMagnitude() > threshold) {
                 currentpoint.setMovement("High");
             }
+            currentpoint.setPhase("Baseline");
         }
+
+    /**
+     * Adds a movement String to each DataPoint based on its magnitude
+     *
+     * @param Baseline data
+     */
+    public void movementLearn(DataPoint currentpoint, int phasenum) {
+        if (currentpoint.getMagnitude() <= 15.0) {
+            currentpoint.setMovement("Low");
+        } else if (15.0 < currentpoint.getMagnitude() && currentpoint.getMagnitude() <= threshold) {
+            currentpoint.setMovement("Medium");
+        } else if (currentpoint.getMagnitude() > threshold) {
+            currentpoint.setMovement("High");
+        }
+        currentpoint.setPhase("Learning" + phasenum);
     }
 
 

@@ -9,6 +9,7 @@ public class DataPoint implements Comparable{
 	private float magnitude;
 	private double time;
 	private String movement; //previously himedlo
+	private String phase;
 	
 	/**
 	 * Creates a DataPoint object to hold data as it comes in.
@@ -28,7 +29,15 @@ public class DataPoint implements Comparable{
 	public String getMovement(){
 		return movement;
 	}
-	
+
+	public String getPhase() {
+		return phase;
+	}
+
+	public void setPhase(String phase) {
+		this.phase = phase;
+	}
+
 	/**
 	* Setter for the movement value
 	* @param movement The new movement value
