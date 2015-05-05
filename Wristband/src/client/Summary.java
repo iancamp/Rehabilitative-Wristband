@@ -11,21 +11,26 @@ import java.awt.event.WindowEvent;
  * Created by Henry on 4/15/2015.
  */
 public class Summary extends JPanel {
-    JFrame frame;
-    Baselining baseline;
+    private JFrame frame;
+    private Baselining baseline;
 
-    JButton saveButton;
+    private JButton saveButton;
 
-    int startingWidth = 600;
-    int startingHeight = 400;
+    private int startingWidth = 600;
+    private int startingHeight = 400;
 
-    private JFrame getFrame(){
+    private static boolean windowOpen = false;
+
+    public JFrame getFrame(){
         return frame;
     }
+
+    public static boolean isWindowOpen() { return windowOpen; }
 
     public Summary(JFrame frame, Baselining baseline){
         this.frame = frame;
         this.baseline = baseline;
+        windowOpen = true;
 
         saveButton = new JButton("Save Data");
         saveButton.setVisible(true);
@@ -40,6 +45,12 @@ public class Summary extends JPanel {
                         null,
                         null,
                         "Name");
+            }
+        });
+
+        frame.addWindowListener(new WindowAdapter() {
+            public void windowClosing(WindowEvent e) {
+                windowOpen = false;
             }
         });
 

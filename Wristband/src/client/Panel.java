@@ -15,27 +15,27 @@ import java.util.LinkedList;
  * Created by kevok on 3/10/15.
  */
 public class Panel extends JPanel{
-    JFrame frame;
-    Baselining baseline;
-    NetworkThread networkThread;
+    private JFrame frame;
+    private Baselining baseline;
+    private NetworkThread networkThread;
 
-    boolean inBaseline;
-    boolean inLearning;
+    private boolean inBaseline;
+    private boolean inLearning;
 
-    JButton baseliningButton;
-    JButton learningButton;
-    JButton summaryButton;
-    JSlider thresholdControl;
-    JSpinner timeControl;
+    private JButton baseliningButton;
+    private JButton learningButton;
+    private JButton summaryButton;
+    private JSlider thresholdControl;
+    private JSpinner timeControl;
 
-    JButton arduinoFail;
-    JButton arduinoTimeOut;
+    private JButton arduinoFail;
+    private JButton arduinoTimeOut;
 
-    JButton pauseButton;
-    JButton cancelButton;
+    private JButton pauseButton;
+    private JButton cancelButton;
 
-    int startingWidth = 800;
-    int startingHeight = 600;
+    private int startingWidth = 800;
+    private int startingHeight = 600;
 
     private void toggleAllVisible(){
         timeControl.setVisible(!timeControl.isVisible());
@@ -104,10 +104,7 @@ public class Panel extends JPanel{
                         JOptionPane.YES_NO_OPTION);
 
                 if(answer == 0){    //JOptionPane returns 0 when user selects Yes
-                    inLearning = false;
-                    inBaseline = false;
-
-                    toggleAllVisible();
+                    shutPhaseDown();
 
                     //TODO: delete all recorded data
                 }
@@ -118,7 +115,9 @@ public class Panel extends JPanel{
         summaryButton = new JButton("Summary");
         summaryButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent evt) {
-                new Summary(new JFrame(), getBaseline());
+                if(!Summary.isWindowOpen()) {
+                    new Summary(new JFrame(), getBaseline()); //check before making a new Summary window
+                }
             }
         });
 
@@ -226,6 +225,12 @@ public class Panel extends JPanel{
         return output;
     }
 
+    private void shutPhaseDown(){
+        inBaseline = false;
+        inLearning = false;
+        toggleAllVisible();
+    }
+
     /**
      * paint(Graphics g) is called repeatedly whenever possible to 
      * repaint the window until the user exits the window. Repaint can be 
@@ -265,9 +270,7 @@ public class Panel extends JPanel{
             }
 
             if(!baseline.getstartBaseline()){
-                inBaseline = false;
-                inLearning = false;
-                toggleAllVisible();
+                shutPhaseDown();
             }
 
             /*Display all incoming Data: */
