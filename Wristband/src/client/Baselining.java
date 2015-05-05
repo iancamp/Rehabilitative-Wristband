@@ -28,6 +28,9 @@ public class Baselining {
     private double minutes;
     private int learnphases;
     private int phasenum;
+    private double baselinetime; //Time that was spent in baseline phase
+    private double timeslice; //timeslice to calculate how big each phase should be.
+    private double endslice; //When current slice of learning phase will end
 
 
     /**
@@ -45,6 +48,23 @@ public class Baselining {
         outliers = 0;
         startBaseline = false;
         startLearning = false;
+        baselinetime = 2; //Default time is 2 minutes unless changed.
+    }
+    
+    /**
+     * Returns the current learning phase number that the application is in.
+     * @return Returns the current 
+     */
+    public int getPhaseNum(){
+    	return phasenum;
+    }
+    
+    /**
+     * Returns the number of learn phases for the Learning Phase.
+     * @return The number of learn phases for the Learning Phase.
+     */
+    public int getLearnPhases(){
+    	return learnphases;
     }
     
     /**
@@ -189,22 +209,29 @@ public class Baselining {
      * session data, and calculates current baseline
      */
     public void updateData() {
-        LinkedList<DataPoint> temporaryNewData = new LinkedList<DataPoint>();
-        wristbandInterface.copyFromQueue(temporaryNewData);
-        if (startBaseline && ((System.currentTimeMillis() - startTime) < timeinphase)) {
-                updateSumMax(temporaryNewData);
-                baselineData.addAll(temporaryNewData);
-                baseline = sum / (baselineData.size() - outliers);
-                timerem = (minutes - ((System.currentTimeMillis() - startTime) / 60000.0));}
-        else{startBaseline=false;}
+    	LinkedList<DataPoint> temporaryNewData = new LinkedList<DataPoint>();
+    	wristbandInterface.copyFromQueue(temporaryNewData);
+    	if (startBaseline && ((System.currentTimeMillis() - startTime) < timeinphase)) {
+    		updateSumMax(temporaryNewData);
+    		baselineData.addAll(temporaryNewData);
+    		baseline = sum / (baselineData.size() - outliers);
+    		timerem = (minutes - ((System.currentTimeMillis() - startTime) / 60000.0));}
+    	else{startBaseline=false;}
 
-        if (startLearning && ((System.currentTimeMillis() - startTime) < timeinphase) && phasenum < learnphases) {
-                for (DataPoint currentpoint : temporaryNewData) {
-                   movementLearn(currentpoint, phasenum);}
-            learningData.addAll(temporaryNewData);
-            timerem = (minutes - ((System.currentTimeMillis() - startTime) / 60000.0));
-        if(timerem < 0){resetlearn();}}
-        else{startLearning=false;}}
+    	if (startLearning && ((System.currentTimeMillis() - startTime) < timeinphase)) {
+    		for (DataPoint currentpoint : temporaryNewData) {
+    			movementLearn(currentpoint);}
+    		learningData.addAll(temporaryNewData);
+    		timerem = (minutes - ((System.currentTimeMillis() - startTime) / 60000.0));
+    		if (minutes - timerem > endslice){
+    			phasenum++;
+    			endslice+=timeslice;
+    		}
+
+
+
+    	}
+    	else{startLearning=false;}}
 
 
     /**
@@ -219,6 +246,7 @@ public class Baselining {
         wristbandInterface.copyFromQueue(emptytrash);
         startBaseline = true;
         this.minutes = minutes;
+        baselinetime = minutes;
         timeinphase = (minutes * 60 * 1000);
         timerem = minutes;
         startTime = System.currentTimeMillis();
@@ -234,20 +262,19 @@ public class Baselining {
         LinkedList<DataPoint> emptytrash = new LinkedList<DataPoint>();
         wristbandInterface.copyFromQueue(emptytrash);
         startLearning = true;
-        learnphases = 3;
-        this.minutes = (minutes / learnphases);
+        this.minutes = minutes;
+        if (minutes < baselinetime){
+        	baselinetime = minutes;
+        }
+        learnphases = (int)(minutes/baselinetime);
+        if (learnphases == 0){
+        	learnphases = 1;
+        }
         timeinphase = (minutes * 60 * 1000);
+        timeslice = minutes/learnphases;
+        endslice = timeslice;
         timerem = minutes;
-        phasenum = 0;
-        startTime = System.currentTimeMillis();
-    }
-
-    /**
-     * Resets learning upon time hitting 0
-     */
-    public void resetlearn(){
-        phasenum++;
-        timerem = minutes;
+        phasenum = 1;
         startTime = System.currentTimeMillis();
     }
 
@@ -256,7 +283,7 @@ public class Baselining {
      *
      * @param Baseline data
      */
-    public void movementLearn(DataPoint currentpoint, int phasenum) {
+    public void movementLearn(DataPoint currentpoint) {
         if (currentpoint.getMagnitude() <= 15.0) {
             currentpoint.setMovement("Low");
         } else if (currentpoint.getMagnitude() <= threshold) {
