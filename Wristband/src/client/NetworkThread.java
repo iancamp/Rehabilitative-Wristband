@@ -194,7 +194,6 @@ public class NetworkThread extends Thread implements SerialPortEventListener{
 		if (!found) {
 			System.out.println("Could not find COM port.");
 			foundcom = -1;
-			return;
 		}
 		reset = false;
 	}
@@ -392,7 +391,7 @@ public class NetworkThread extends Thread implements SerialPortEventListener{
 			if (reset && foundcom != 1){
 				startup();
 			}
-			if (sendthreshold){
+			if (sendthreshold && !randomon){
 				sendThreshold();
 			}
 			try {
