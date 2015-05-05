@@ -46,6 +46,14 @@ public class Baselining {
         startBaseline = false;
         startLearning = false;
     }
+    
+    /**
+     * Returns the data from the learning phase.
+     * @return The data from the learning phase.
+     */
+    public LinkedList<DataPoint> getLearningData(){
+    	return learningData;
+    }
 
     /**
      * Returns the sum of magnitudes of data in the current session
@@ -164,7 +172,6 @@ public class Baselining {
             } else {
                 sum += currentPoint.getMagnitude();
             }
-            movementBase(currentPoint);
         }
     }
 
@@ -244,23 +251,6 @@ public class Baselining {
         startTime = System.currentTimeMillis();
     }
 
-
-    /**
-     * Adds a movement String to each DataPoint based on its magnitude
-     *
-     * @param Baseline data
-     */
-    public void movementBase(DataPoint currentpoint) {
-            if (currentpoint.getMagnitude() <= 15.0) {
-                currentpoint.setMovement("Low");
-            } else if (15.0 < currentpoint.getMagnitude() && currentpoint.getMagnitude() <= threshold) {
-                currentpoint.setMovement("Medium");
-            } else if (currentpoint.getMagnitude() > threshold) {
-                currentpoint.setMovement("High");
-            }
-            currentpoint.setPhase("Baseline");
-        }
-
     /**
      * Adds a movement String to each DataPoint based on its magnitude
      *
@@ -269,9 +259,9 @@ public class Baselining {
     public void movementLearn(DataPoint currentpoint, int phasenum) {
         if (currentpoint.getMagnitude() <= 15.0) {
             currentpoint.setMovement("Low");
-        } else if (15.0 < currentpoint.getMagnitude() && currentpoint.getMagnitude() <= threshold) {
+        } else if (currentpoint.getMagnitude() <= threshold) {
             currentpoint.setMovement("Medium");
-        } else if (currentpoint.getMagnitude() > threshold) {
+        } else {
             currentpoint.setMovement("High");
         }
         currentpoint.setPhase("Learning" + phasenum);
