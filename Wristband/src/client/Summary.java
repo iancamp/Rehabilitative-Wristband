@@ -36,15 +36,15 @@ public class Summary extends JPanel {
         saveButton.setVisible(true);
         saveButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent evt) {
-                String name = (String)JOptionPane.showInputDialog(
+                String name = (String) JOptionPane.showInputDialog(
                         getFrame(),
-                        "Input the Baby's name\n"
+                        "Input the Baby's ID\n"
                                 + "To be saved in the export file.",
                         "Baby's Name Input",
                         JOptionPane.PLAIN_MESSAGE,
                         null,
                         null,
-                        "Name");
+                        "ID");
             }
         });
 
@@ -54,7 +54,7 @@ public class Summary extends JPanel {
             }
         });
 
-        //this.add(saveButton);
+        this.add(saveButton);
 
         frame.getContentPane().add(this);
         frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
@@ -66,15 +66,30 @@ public class Summary extends JPanel {
         frame.setBackground(Color.white);
     }
 
+    /**
+     * Factory to create a Summary, only if one does not already exist.
+     * @param frame
+     * @param baseline
+     * @return
+     */
+    public static Summary createSummary(JFrame frame, Baselining baseline){
+        if(!windowOpen){
+            return new Summary(frame,baseline);
+        }
+        else{
+            return null;
+        }
+    }
+
     @Override
     public void paint (Graphics g) {
         g.setFont(new Font("Courier New", Font.BOLD, 22));
         g.drawString("Low",(int)(.1*getWidth()),(int)(.3*getHeight()));
-        g.drawString("Medium", (int)(.25*getWidth()),(int) (.3 * getHeight()));
+        g.drawString("Medium", (int) (.25 * getWidth()),(int) (.3 * getHeight()));
         g.drawString("High", (int)(.45*getWidth()),(int) (.3 * getHeight()));
         g.drawString("Baseline",(int)(.6*getWidth()),(int)(.3*getHeight()));
 
-        saveButton.setBounds((int)(this.getWidth()*.1),(int)(this.getHeight()*.05),(int)(this.getWidth()*.25),(int)(this.getHeight()*.1));
+        //saveButton.setBounds((int)(this.getWidth()*.12),(int)(this.getHeight()*.08),(int)(this.getWidth()*.25),(int)(this.getHeight()*.12));
 
         g.setFont(new Font("Courier New", Font.PLAIN, 20));
 

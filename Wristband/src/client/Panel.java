@@ -115,9 +115,7 @@ public class Panel extends JPanel{
         summaryButton = new JButton("Summary");
         summaryButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent evt) {
-                if(!Summary.isWindowOpen()) {
-                    new Summary(new JFrame(), getBaseline()); //check before making a new Summary window
-                }
+                    Summary.createSummary(new JFrame(), getBaseline()); //check before making a new Summary window
             }
         });
 
