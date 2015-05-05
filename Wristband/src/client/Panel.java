@@ -68,7 +68,6 @@ public class Panel extends JPanel{
 
                 getBaseline().baselinePhase((Double)(timeControl.getValue()));
 
-                //TODO: collect data as Baselining Phase
             }
         });
 
@@ -79,7 +78,9 @@ public class Panel extends JPanel{
                 inLearning = true;
                 toggleAllVisible();
 
-                //TODO: collect data as Learning Phase
+                getBaseline().setAllThresholds(thresholdControl.getValue()); //send threshold before starting
+                getBaseline().learningPhase((Double)timeControl.getValue());
+
             }
         });
 
@@ -244,7 +245,7 @@ public class Panel extends JPanel{
             g.setFont(new Font("Times New Roman", Font.PLAIN, 40));
             g.drawString("Loading...", (int) (.25 * getWidth()), (int) (.4 * getHeight()));
         }
-        else if(foundCom < 0){ //failed
+        else if(foundCom < 0){ //failed to find Ardiuno
             g.setFont(new Font("Times New Roman", Font.BOLD, 50));
             g.drawString("Failed to find Arduino!", (int) (.25 * getWidth()), (int) (.4 * getHeight()));
             arduinoFail.setVisible(true);
@@ -254,22 +255,20 @@ public class Panel extends JPanel{
             arduinoTimeOut.setBounds((int) (.25 * getWidth()), (int) (.55 * getHeight()), (int) (.35 * getWidth()), (int) (.13 * getHeight()));
             arduinoTimeOut.setVisible(true);
         }
-        else if(inLearning || inBaseline){ //in a phase, collecting data
-            pauseButton.setBounds((int) (.05 * getWidth()), (int) (.1 * getHeight()), (int) (.42 * getWidth()), (int) (.1 * getHeight()));
-            cancelButton.setBounds((int) (.5 * getWidth()), (int) (.1 * getHeight()), (int) (.42 * getWidth()), (int) (.1 * getHeight()));
-
-            g.setFont(new Font("Courier New", Font.PLAIN, 26));
-            Double t = (Double)(timeControl.getValue());
-            g.drawString(getTimeString(baseline.getTimerem()), (int) (.42 * this.getWidth()), (int) (.06 * this.getHeight()));
-
-            g.setFont(new Font("Courier New", Font.PLAIN, 30));
-            if(inLearning){
-                g.drawString("Learning Phase: Threshold = " + thresholdControl.getValue(),(int) (.045 * getWidth()), (int) (.26 * getHeight()));
-            }
+        else if(inBaseline){ //in baseline phase, collecting data
+            displayPhaseScreen(g);
 
             if(!baseline.getstartBaseline()){
                 shutPhaseDown();
             }
+
+            /*Display all incoming Data: */
+            displayAllData(g);
+        }
+        else if(inLearning){ //in learning phase, collecting data
+            displayPhaseScreen(g);
+
+
 
             /*Display all incoming Data: */
             displayAllData(g);
@@ -314,6 +313,24 @@ public class Panel extends JPanel{
                     Math.abs(d.getMagnitude())
             ), (int) (.01 * this.getWidth()), (int) (.45 * this.getHeight()) + y);
             y += 20;
+        }
+    }
+
+    /**
+     * Display all text and buttons for either Baseline or Learning Phase
+     * @param g
+     */
+    private void displayPhaseScreen(Graphics g){
+        pauseButton.setBounds((int) (.05 * getWidth()), (int) (.1 * getHeight()), (int) (.42 * getWidth()), (int) (.1 * getHeight()));
+        cancelButton.setBounds((int) (.5 * getWidth()), (int) (.1 * getHeight()), (int) (.42 * getWidth()), (int) (.1 * getHeight()));
+
+        g.setFont(new Font("Courier New", Font.PLAIN, 26));
+        Double t = (Double)(timeControl.getValue());
+        g.drawString(getTimeString(baseline.getTimerem()), (int) (.42 * this.getWidth()), (int) (.06 * this.getHeight()));
+
+        g.setFont(new Font("Courier New", Font.PLAIN, 30));
+        if(inLearning){
+            g.drawString("Learning Phase: Threshold = " + thresholdControl.getValue(),(int) (.045 * getWidth()), (int) (.26 * getHeight()));
         }
     }
 
