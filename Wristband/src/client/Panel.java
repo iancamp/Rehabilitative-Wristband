@@ -22,6 +22,7 @@ public class Panel extends JPanel{
     private boolean inBaseline;
     private boolean inLearning;
 
+    private double maxTime = 20;
     private JButton baseliningButton;
     private JButton learningButton;
     private JButton summaryButton;
@@ -55,7 +56,7 @@ public class Panel extends JPanel{
         inLearning = false;
 
         /* Create Spinner for control over the length of each phase */
-        timeControl = new JSpinner(new SpinnerNumberModel(2,.5,10,.5));
+        timeControl = new JSpinner(new SpinnerNumberModel(2,.5,999999999.0,.5));
         timeControl.setFont(new Font("Courier New", Font.PLAIN, 20));
 
         /* Create Baselining Phase Button & Implementation */
@@ -63,6 +64,9 @@ public class Panel extends JPanel{
         baseliningButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent evt) {
                 inBaseline = true;
+                if((Double)timeControl.getValue()>maxTime){
+                    timeControl.setValue(maxTime);
+                }
                 getBaseline().setAllThresholds(999); //set threshold very high to stop toy from activing during baseline
                 toggleAllVisible();
 
@@ -76,6 +80,9 @@ public class Panel extends JPanel{
         learningButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent evt) {
                 inLearning = true;
+                if((Double)timeControl.getValue()>maxTime){
+                    timeControl.setValue(maxTime);
+                }
                 toggleAllVisible();
 
                 getBaseline().setAllThresholds(thresholdControl.getValue()); //send threshold before starting
