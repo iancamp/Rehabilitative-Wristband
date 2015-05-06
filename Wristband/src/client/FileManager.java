@@ -26,7 +26,8 @@ public final class FileManager{
 	*@param id: The id of the baby which will be put at the top of the file
 	*/
 	public static void saveToCSV(Baselining b, String id){
-		LinkedList<DataPoint> data = b.getbaselineData(); //get the list of data
+		LinkedList<DataPoint> baselineData = b.getbaselineData(); //get the list of data
+		LinkedList<DataPoint> learningData = b.getLearningData();
 		DataPoint dp; //the current data point in the list
 		FileWriter fw;
 		BufferedWriter bw;
@@ -44,12 +45,20 @@ public final class FileManager{
 			bw.write("ID,date,time,threshold\n");
 			bw.write(fileName.replace("_",",").replace(".csv","") + "," + b.getThreshold() + "\n\n");
 			
-			bw.write("time,magnitude,movement\n");
+			bw.write("time,magnitude,movement,\n");
 			//loop through list of data and write to csv file
-			ListIterator<DataPoint> li = data.listIterator();
+			ListIterator<DataPoint> li = baselineData.listIterator();
 			while(li.hasNext()){
 				dp = li.next();
 				
+				bw.write(dp.getTime() + "," + dp.getMagnitude() + "," + dp.getMovement() + "\n"); //write to file
+			}
+			
+			bw.write("\n\n"); //separate the baseline data from the learning phase data
+		
+			li = learningData.listIterator();
+			while(li.hasNext()){
+				dp = li.next();
 				bw.write(dp.getTime() + "," + dp.getMagnitude() + "," + dp.getMovement() + "\n"); //write to file
 			}
 			
