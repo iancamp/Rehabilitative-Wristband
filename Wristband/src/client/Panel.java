@@ -3,6 +3,7 @@ package client;
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import javax.swing.text.DefaultFormatter;
 import javax.xml.crypto.Data;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -23,6 +24,7 @@ public class Panel extends JPanel{
     private boolean inLearning;
 
     private double maxTime = 20;
+    private double minTime = .5;
     private JButton baseliningButton;
     private JButton learningButton;
     private JButton summaryButton;
@@ -58,15 +60,25 @@ public class Panel extends JPanel{
         /* Create Spinner for control over the length of each phase */
         timeControl = new JSpinner(new SpinnerNumberModel(2,-Double.MAX_VALUE,Double.MAX_VALUE,.5));
         timeControl.setFont(new Font("Courier New", Font.PLAIN, 20));
+        /* Create constraints on input of Time Controller */
+        JComponent comp = timeControl.getEditor();
+        JFormattedTextField field = (JFormattedTextField) comp.getComponent(0);
+        DefaultFormatter formatter = (DefaultFormatter) field.getFormatter();
+        formatter.setCommitsOnValidEdit(true);
+        timeControl.addChangeListener(new ChangeListener() {
+
+            @Override
+            public void stateChanged(ChangeEvent e) {
+                constraintTimeInput();
+            }
+        });
 
         /* Create Baselining Phase Button & Implementation */
         baseliningButton = new JButton("Start Baselining Phase");
         baseliningButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent evt) {
                 inBaseline = true;
-                if((Double)timeControl.getValue()>maxTime){
-                    timeControl.setValue(maxTime);
-                }
+                constraintTimeInput();
                 getBaseline().setAllThresholds(999); //set threshold very high to stop toy from activing during baseline
                 toggleAllVisible();
 
@@ -80,9 +92,7 @@ public class Panel extends JPanel{
         learningButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent evt) {
                 inLearning = true;
-                if((Double)timeControl.getValue()>maxTime){
-                    timeControl.setValue(maxTime);
-                }
+                constraintTimeInput();
                 toggleAllVisible();
 
                 getBaseline().setAllThresholds(thresholdControl.getValue()); //send threshold before starting
@@ -235,10 +245,25 @@ public class Panel extends JPanel{
         return output;
     }
 
+    /**
+     * Change all variables as needed for Phase shutdown
+     */
     private void shutPhaseDown(){
         inBaseline = false;
         inLearning = false;
         toggleAllVisible();
+    }
+
+    /**
+     * Ensures time input is between max and min limits.
+     */
+    private void constraintTimeInput(){
+        if((Double)timeControl.getValue()>maxTime){
+            timeControl.setValue(maxTime);
+        }
+        else if((Double)timeControl.getValue()<minTime){
+            timeControl.setValue(minTime);
+        }
     }
 
     /**
