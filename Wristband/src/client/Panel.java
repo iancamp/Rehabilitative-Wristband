@@ -105,9 +105,13 @@ public class Panel extends JPanel{
                         JOptionPane.YES_NO_OPTION);
 
                 if(answer == 0){    //JOptionPane returns 0 when user selects Yes
+                    if(inBaseline){
+                        getBaseline().baselineCancel();
+                    }
+                    if(inLearning){
+                        getBaseline().learningCancel();
+                    }
                     shutPhaseDown();
-
-                    //TODO: delete all recorded data
                 }
             }
         });
@@ -343,6 +347,8 @@ public class Panel extends JPanel{
         g.setFont(new Font("Courier New", Font.PLAIN, 30));
         if(inLearning){
             g.drawString("Learning Phase: Threshold = " + thresholdControl.getValue(),(int) (.045 * getWidth()), (int) (.26 * getHeight()));
+            g.drawString("In Phase: " + baseline.getPhaseNum() + " / " + baseline.getLearnPhases(),
+                    (int)(.1*getWidth()), (int)(.33*getHeight()));
         }
     }
 
