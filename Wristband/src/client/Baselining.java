@@ -218,7 +218,7 @@ public class Baselining {
     		baselineData.addAll(temporaryNewData);
     		baseline = sum / (baselineData.size() - outliers);
     		timerem = (minutes - ((System.currentTimeMillis() - startTime) / 60000.0));}
-    	else{startBaseline=false;}
+    	else if (!ispaused){startBaseline=false;}
 
     	if (!ispaused && startLearning && ((System.currentTimeMillis() - startTime) < timeinphase)) {
     		for (DataPoint currentpoint : temporaryNewData) {
@@ -233,7 +233,7 @@ public class Baselining {
 
 
     	}
-    	else{startLearning=false;}}
+    	else if (!ispaused){startLearning=false;}}
 
     /**
      * Pauses the execution of either phase. Updates time to ensure timing is consistent after pause.
