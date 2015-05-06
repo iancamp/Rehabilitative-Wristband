@@ -250,9 +250,25 @@ public class Baselining {
     }
     
     /**
+     * Calls cancel() function and clears all collected data from learning phase.
+     */
+    public void learningCancel(){
+    	cancel();
+    	learningData.clear();
+    }
+    
+    /**
+     * Calls cancel() function and clears all collected data from baseline phase.
+     */
+    public void baselineCancel(){
+    	cancel();
+    	baselineData.clear();
+    }
+    
+    /**
      * Cancels the current phase execution and returns to the main screen.
      */
-    public void cancel(){
+    private void cancel(){
     	ispaused = false;
     	startBaseline = false;
     	startLearning = false;
