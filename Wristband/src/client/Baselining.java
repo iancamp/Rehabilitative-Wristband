@@ -249,6 +249,15 @@ public class Baselining {
     	}
     }
     
+    /**
+     * Cancels the current phase execution and returns to the main screen.
+     */
+    public void cancel(){
+    	ispaused = false;
+    	startBaseline = false;
+    	startLearning = false;
+    }
+    
 
     /**
      * Updates data for an amount of time and computes threshold
