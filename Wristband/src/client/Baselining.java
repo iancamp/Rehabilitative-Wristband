@@ -31,6 +31,8 @@ public class Baselining {
     private double baselinetime; //Time that was spent in baseline phase
     private double timeslice; //timeslice to calculate how big each phase should be.
     private double endslice; //When current slice of learning phase will end
+    private double pausetime; //Time at the time of a pause event.
+    private boolean ispaused; //Whether or not the program is in a paused state.
 
 
     /**
@@ -211,14 +213,14 @@ public class Baselining {
     public void updateData() {
     	LinkedList<DataPoint> temporaryNewData = new LinkedList<DataPoint>();
     	wristbandInterface.copyFromQueue(temporaryNewData);
-    	if (startBaseline && ((System.currentTimeMillis() - startTime) < timeinphase)) {
+    	if (!ispaused && startBaseline && ((System.currentTimeMillis() - startTime) < timeinphase)) {
     		updateSumMax(temporaryNewData);
     		baselineData.addAll(temporaryNewData);
     		baseline = sum / (baselineData.size() - outliers);
     		timerem = (minutes - ((System.currentTimeMillis() - startTime) / 60000.0));}
     	else{startBaseline=false;}
 
-    	if (startLearning && ((System.currentTimeMillis() - startTime) < timeinphase)) {
+    	if (!ispaused && startLearning && ((System.currentTimeMillis() - startTime) < timeinphase)) {
     		for (DataPoint currentpoint : temporaryNewData) {
     			movementLearn(currentpoint);}
     		learningData.addAll(temporaryNewData);
@@ -233,6 +235,20 @@ public class Baselining {
     	}
     	else{startLearning=false;}}
 
+    /**
+     * Pauses the execution of either phase. Updates time to ensure timing is consistent after pause.
+     */
+    public void pause(){
+    	if (!ispaused){
+    		ispaused = true;
+    		pausetime = System.currentTimeMillis();
+    	}
+    	else {
+    		ispaused = false;
+    		startTime += (System.currentTimeMillis() - pausetime);
+    	}
+    }
+    
 
     /**
      * Updates data for an amount of time and computes threshold
