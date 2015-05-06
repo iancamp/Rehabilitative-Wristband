@@ -263,6 +263,10 @@ public class Baselining {
     public void baselineCancel(){
     	cancel();
     	baselineData.clear();
+    	sum = 0;
+        baseline = 0;
+        timerem = 0;
+        outliers = 0;
     }
     
     /**
