@@ -98,7 +98,7 @@ public class Summary extends JPanel {
 
         g.setFont(new Font("Courier New", Font.PLAIN, 20));
 
-        g.drawString(baseline.getSum()+"", (int)(.62*this.getWidth()), (int)(.35*this.getHeight())+30);
+        g.drawString(baseline.getBaseline()+"", (int)(.62*this.getWidth()), (int)(.35*this.getHeight())+30);
 
         revalidate();
     }

@@ -22,6 +22,7 @@ public class Panel extends JPanel{
 
     private boolean inBaseline;
     private boolean inLearning;
+    private int suggestedThreshold;
 
     private double maxTime = 20;
     private double minTime = .5;
@@ -249,6 +250,11 @@ public class Panel extends JPanel{
      * Change all variables as needed for Phase shutdown
      */
     private void shutPhaseDown(){
+        if(inBaseline){
+            suggestedThreshold = (int)baseline.getBaseline();
+            thresholdControl.setValue(suggestedThreshold);
+            baseline.setAllThresholds(suggestedThreshold);
+        }
         inBaseline = false;
         inLearning = false;
         toggleAllVisible();
@@ -330,6 +336,8 @@ public class Panel extends JPanel{
             summaryButton.setBounds((int) (.65 * getWidth()), (int) (.35 * getHeight()), (int) (.25 * getWidth()), (int) (.08 * getHeight()));
             summaryButton.setBounds((int) (.65 * getWidth()), (int) (.35 * getHeight()), (int) (.25 * getWidth()), (int) (.08 * getHeight()));
             thresholdControl.setBounds((int) (.04 * getWidth()), (int) (.24 * getHeight()), (int) (.9 * getWidth()), (int) (.08 * getHeight()));
+            g.setFont(new Font("Times New Roman", Font.PLAIN, 32));
+            g.drawString("Suggested Threshold: " + suggestedThreshold, (int) (.05 * getWidth()), (int) (.42 * getHeight()));
             revalidate();
         }
     }
@@ -348,14 +356,14 @@ public class Panel extends JPanel{
         }
 
         g.setFont(new Font("Courier New", Font.PLAIN, 20));
-        g.drawString("Data:", (int) (.06 * this.getWidth()), (int) (.4 * this.getHeight()));
+        g.drawString("Time: Data:", (int) (.03 * this.getWidth()), (int) (.4 * this.getHeight()));
         if(inBaseline){
             g.drawString("Sum:", (int) (.25 * this.getWidth()), (int) (.4 * this.getHeight()));
             //float sum = baseline.getSum();
-            g.drawString(baseline.getSum() + "", (int) (.4 * this.getWidth()), (int) (.4 * this.getHeight()) + 30);
-            g.drawString("Baseline:", (int) (.4 * this.getWidth()), (int) (.4 * this.getHeight()));
+            g.drawString(baseline.getSum() + "", (int) (.25 * this.getWidth()), (int) (.4 * this.getHeight()) + 30);
+            g.drawString("Baseline:", (int) (.42 * this.getWidth()), (int) (.4 * this.getHeight()));
             //float avg = baseline.getBaseline();
-            g.drawString(baseline.getBaseline() + "", (int) (.25 * this.getWidth()), (int) (.4 * this.getHeight()) + 30);
+            g.drawString(baseline.getBaseline() + "", (int) (.42 * this.getWidth()), (int) (.4 * this.getHeight()) + 30);
         }
 
         LinkedList<DataPoint> top20 = new LinkedList<DataPoint>();
@@ -370,7 +378,7 @@ public class Panel extends JPanel{
                     "%7.2f: %5.2f",
                     d.getTime(),
                     Math.abs(d.getMagnitude())
-            ), (int) (.01 * this.getWidth()), (int) (.45 * this.getHeight()) + y);
+            ), (int) (.005 * this.getWidth()), (int) (.45 * this.getHeight()) + y);
             y += 20;
         }
     }
