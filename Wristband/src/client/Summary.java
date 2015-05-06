@@ -24,6 +24,7 @@ public class Summary extends JPanel {
     public JFrame getFrame(){
         return frame;
     }
+    public Baselining getBaseline() { return baseline; }
 
     public static boolean isWindowOpen() { return windowOpen; }
 
@@ -37,7 +38,7 @@ public class Summary extends JPanel {
         saveButton.setVisible(true);
         saveButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent evt) {
-                String name = (String) JOptionPane.showInputDialog(
+                String id = (String) JOptionPane.showInputDialog(
                         getFrame(),
                         "Input the Baby's ID\n"
                                 + "To be saved in the export file.",
@@ -46,6 +47,7 @@ public class Summary extends JPanel {
                         null,
                         null,
                         "ID");
+                FileManager.saveToCSV(getBaseline(),id);
             }
         });
 
