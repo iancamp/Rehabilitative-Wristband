@@ -278,8 +278,19 @@ public class Panel extends JPanel{
         /*check for Ardiuno on startup */
         int foundCom = networkThread.getFoundCom();
         if(foundCom == 0 && !networkThread.getTimeOut()){ //still searching
+            String loadDots = "";
+            long seconds = System.currentTimeMillis()/1000;
+            if(seconds%4 == 0){
+                loadDots = ".";
+            }
+            else if(seconds%4 == 1){
+                loadDots = "..";
+            }
+            else if(seconds%4 == 2){
+                loadDots = "...";
+            }
             g.setFont(new Font("Times New Roman", Font.PLAIN, 40));
-            g.drawString("Loading...", (int) (.25 * getWidth()), (int) (.4 * getHeight()));
+            g.drawString("Loading" + loadDots, (int) (.25 * getWidth()), (int) (.4 * getHeight()));
         }
         else if(foundCom < 0){ //failed to find Ardiuno
             g.setFont(new Font("Times New Roman", Font.BOLD, 50));
