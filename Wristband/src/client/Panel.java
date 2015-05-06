@@ -319,6 +319,9 @@ public class Panel extends JPanel{
         for (DataPoint d : top20) {
             //this.setForeground(Color.BLUE);
             //g.setFont(g.getFont().setForeground(Color.BLUE));
+            if(inLearning) {
+                g.drawString(d.getMovement(), (int) (.1 * this.getWidth()), (int) (.45 * this.getHeight()) + y);
+            }
             g.drawString(String.format(
                     "%7.2f: %5.2f",
                     d.getTime(),
