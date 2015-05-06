@@ -56,7 +56,7 @@ public class Panel extends JPanel{
         inLearning = false;
 
         /* Create Spinner for control over the length of each phase */
-        timeControl = new JSpinner(new SpinnerNumberModel(2,.5,999999999.0,.5));
+        timeControl = new JSpinner(new SpinnerNumberModel(2,-Double.MAX_VALUE,Double.MAX_VALUE,.5));
         timeControl.setFont(new Font("Courier New", Font.PLAIN, 20));
 
         /* Create Baselining Phase Button & Implementation */
