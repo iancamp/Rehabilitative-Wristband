@@ -89,7 +89,7 @@ public class Panel extends JPanel{
         pauseButton.setVisible(false);
         pauseButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent evt) {
-                //TODO:Do stuff to stop incoming data.
+                getBaseline().pause();
             }
         });
 
@@ -116,7 +116,7 @@ public class Panel extends JPanel{
         summaryButton = new JButton("Summary");
         summaryButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent evt) {
-                    Summary.createSummary(new JFrame(), getBaseline()); //check before making a new Summary window
+                Summary.createSummary(new JFrame(), getBaseline()); //check before making a new Summary window
             }
         });
 
@@ -305,10 +305,10 @@ public class Panel extends JPanel{
         if(inBaseline){
             g.drawString("Sum:", (int) (.25 * this.getWidth()), (int) (.4 * this.getHeight()));
             //float sum = baseline.getSum();
-            g.drawString(baseline.getSum() + "", (int) (.4 * this.getWidth()), (int) (.4 * this.getHeight()) + 30); //need to append "" to make the float a String
+            g.drawString(baseline.getSum() + "", (int) (.4 * this.getWidth()), (int) (.4 * this.getHeight()) + 30);
             g.drawString("Baseline:", (int) (.4 * this.getWidth()), (int) (.4 * this.getHeight()));
             //float avg = baseline.getBaseline();
-            g.drawString(baseline.getBaseline() + "", (int) (.25 * this.getWidth()), (int) (.4 * this.getHeight()) + 30); //need to append "" to make the float a String
+            g.drawString(baseline.getBaseline() + "", (int) (.25 * this.getWidth()), (int) (.4 * this.getHeight()) + 30);
         }
 
         LinkedList<DataPoint> top20 = new LinkedList<DataPoint>();
@@ -317,11 +317,8 @@ public class Panel extends JPanel{
         }
         int y = 0;
         for (DataPoint d : top20) {
-            //this.setForeground(Color.BLUE);
-            //g.setFont(g.getFont().setForeground(Color.BLUE));
-            if(inLearning) {
-                g.drawString(d.getMovement(), (int) (.1 * this.getWidth()), (int) (.45 * this.getHeight()) + y);
-            }
+            g.drawString(d.getMovement(), (int) (.3 * this.getWidth()), (int) (.45 * this.getHeight()) + y);
+
             g.drawString(String.format(
                     "%7.2f: %5.2f",
                     d.getTime(),
