@@ -268,7 +268,9 @@ public class Panel extends JPanel{
         else if(inLearning){ //in learning phase, collecting data
             displayPhaseScreen(g);
 
-
+            if(!baseline.getStartLearning()){
+                shutPhaseDown();
+            }
 
             /*Display all incoming Data: */
             displayAllData(g);
@@ -290,15 +292,25 @@ public class Panel extends JPanel{
      * @param g
      */
     private void displayAllData(Graphics g){
-        LinkedList<DataPoint> values = baseline.getbaselineData();
+        LinkedList<DataPoint> values = new LinkedList<DataPoint>();
+        if(baseline.getstartBaseline()){
+            values = baseline.getbaselineData();
+        }
+        else if (baseline.getStartLearning()) {
+            values = baseline.getLearningData();
+        }
+
         g.setFont(new Font("Courier New", Font.PLAIN, 20));
         g.drawString("Data:", (int) (.06 * this.getWidth()), (int) (.4 * this.getHeight()));
-        g.drawString("Sum:", (int) (.25 * this.getWidth()), (int) (.4 * this.getHeight()));
-        //float sum = baseline.getSum();
-        g.drawString(baseline.getSum() + "", (int) (.4 * this.getWidth()), (int) (.4 * this.getHeight()) + 30); //need to append "" to make the float a String
-        g.drawString("Baseline:", (int) (.4 * this.getWidth()), (int) (.4 * this.getHeight()));
-        //float avg = baseline.getBaseline();
-        g.drawString(baseline.getBaseline() + "", (int) (.25 * this.getWidth()), (int) (.4 * this.getHeight()) + 30); //need to append "" to make the float a String
+        if(inBaseline){
+            g.drawString("Sum:", (int) (.25 * this.getWidth()), (int) (.4 * this.getHeight()));
+            //float sum = baseline.getSum();
+            g.drawString(baseline.getSum() + "", (int) (.4 * this.getWidth()), (int) (.4 * this.getHeight()) + 30); //need to append "" to make the float a String
+            g.drawString("Baseline:", (int) (.4 * this.getWidth()), (int) (.4 * this.getHeight()));
+            //float avg = baseline.getBaseline();
+            g.drawString(baseline.getBaseline() + "", (int) (.25 * this.getWidth()), (int) (.4 * this.getHeight()) + 30); //need to append "" to make the float a String
+        }
+
         LinkedList<DataPoint> top20 = new LinkedList<DataPoint>();
         for (int i = values.size() - 1; i > Math.max(0, values.size() - 20); i--) {
             top20.add(values.get(i));
@@ -307,6 +319,9 @@ public class Panel extends JPanel{
         for (DataPoint d : top20) {
             //this.setForeground(Color.BLUE);
             //g.setFont(g.getFont().setForeground(Color.BLUE));
+            if(inLearning) {
+                g.drawString(d.getMovement(), (int) (.1 * this.getWidth()), (int) (.45 * this.getHeight()) + y);
+            }
             g.drawString(String.format(
                     "%7.2f: %5.2f",
                     d.getTime(),
