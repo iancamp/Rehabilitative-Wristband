@@ -40,6 +40,7 @@ public class Panel extends JPanel{
     private static int largeTextSize = 36;
     private static int mediumTextSize = 30;
     private static int smallTextSize = 22;
+    private static int dataTextSize = 22;
 
     private JButton pauseButton;
     private JButton cancelButton;
@@ -208,10 +209,10 @@ public class Panel extends JPanel{
         frame.addComponentListener(new ComponentAdapter()
         {
             public void componentResized(ComponentEvent evt) {
-                double fontMultiplerWidth = .016;
-                double fontMultiplerHeight = .008;
-
-                int buttonFontSize = (int)(getWidth()*fontMultiplerWidth) + (int)(getHeight()*fontMultiplerHeight);
+                int buttonFontSize = (int)(getWidth()*.018) + (int)(getHeight()*.01);
+                if(buttonFontSize < 12){
+                    buttonFontSize = 12;
+                }
 
                 timeControl.setFont(new Font("Times New Roman", Font.PLAIN, buttonFontSize));
                 baseliningButton.setFont(new Font("Times New Roman", Font.PLAIN, buttonFontSize));
@@ -222,6 +223,26 @@ public class Panel extends JPanel{
                 arduinoTimeOut.setFont(new Font("Times New Roman", Font.PLAIN, buttonFontSize));
                 pauseButton.setFont(new Font("Times New Roman", Font.PLAIN, buttonFontSize));
                 cancelButton.setFont(new Font("Times New Roman", Font.PLAIN, buttonFontSize));
+
+                smallTextSize = (int)(getWidth()*.018) + (int)(getHeight()*.012);
+                mediumTextSize = (int)(getWidth()*.02) + (int)(getHeight()*.01);
+                largeTextSize = (int)(getWidth()*.03) + (int)(getHeight()*.024);
+
+                dataTextSize = (int)(getWidth()*.012) + (int)(getHeight()*.012);
+
+                if(smallTextSize < 10){
+                    smallTextSize = 10;
+                }
+                if(mediumTextSize < 16){
+                    mediumTextSize = 16;
+                }
+                if(largeTextSize < 20){
+                    largeTextSize = 20;
+                }
+                if(dataTextSize < 10){
+                    dataTextSize = 10;
+                }
+
             }
         });
 
@@ -357,9 +378,9 @@ public class Panel extends JPanel{
         }
         else if(networkThread.getTimeOut()){
             g.setFont(new Font("Times New Roman", Font.BOLD, largeTextSize));
-            g.drawString("The connection with the Arduino was lost.", (int) (.2 * getHeight()), (int) (.2 * getWidth()));
+            g.drawString("The connection with the Arduino was lost.", (int) (.15 * getWidth()), (int) (.4 * getHeight()));
             g.setFont(new Font("Times New Roman", Font.PLAIN, smallTextSize));
-            g.drawString("Please make sure the Arduino is connected and retry", (int) (.2 * getHeight()), (int) (.3 * getWidth()));
+            g.drawString("Please make sure the Arduino is connected and retry", (int) (.16 * getWidth()), (int) (.48 * getHeight()));
             arduinoTimeOut.setBounds((int) (.25 * getWidth()), (int) (.55 * getHeight()), (int) (.35 * getWidth()), (int) (.13 * getHeight()));
             arduinoTimeOut.setVisible(true);
         }
@@ -437,7 +458,7 @@ public class Panel extends JPanel{
             values = baseline.getExtinctionData();
         }
 
-        g.setFont(new Font("Courier New", Font.PLAIN, smallTextSize));
+        g.setFont(new Font("Courier New", Font.PLAIN, dataTextSize));
         g.drawString("Time: Data:", (int) (.03 * this.getWidth()), (int) (.4 * this.getHeight()));
         if(inBaseline){
             g.drawString("Sum:", (int) (.25 * this.getWidth()), (int) (.4 * this.getHeight()));
@@ -473,9 +494,9 @@ public class Panel extends JPanel{
         pauseButton.setBounds((int) (.05 * getWidth()), (int) (.1 * getHeight()), (int) (.42 * getWidth()), (int) (.1 * getHeight()));
         cancelButton.setBounds((int) (.5 * getWidth()), (int) (.1 * getHeight()), (int) (.42 * getWidth()), (int) (.1 * getHeight()));
 
-        g.setFont(new Font("Courier New", Font.PLAIN, smallTextSize));
+        g.setFont(new Font("Courier New", Font.PLAIN, largeTextSize));
         Double t = (Double)(timeControl.getValue());
-        g.drawString(getTimeString(baseline.getTimerem()), (int) (.42 * this.getWidth()), (int) (.06 * this.getHeight()));
+        g.drawString(getTimeString(baseline.getTimerem()), (int) (.44 * this.getWidth()), (int) (.07 * this.getHeight()));
     }
 
 }
