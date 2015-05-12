@@ -113,11 +113,11 @@ public class Panel extends JPanel{
         extinctionButton = new JButton("Extinction Button");
         extinctionButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent evt) {
-//                inExtinction = true;
-//                constraintTimeInput();
-//                toggleAllVisible();
+                inExtinction = true;
+                constraintTimeInput();
+                toggleAllVisible();
 
-                //TODO: implement extinction phase
+                getBaseline().extinctionPhase((Double) timeControl.getValue());
 
             }
         });
@@ -150,7 +150,7 @@ public class Panel extends JPanel{
                         getBaseline().learningCancel();
                     }
                     if(inExtinction){
-                        //TODO: cancel extinction
+                        getBaseline().extinctionCancel();
                     }
                     shutPhaseDown();
                 }
@@ -335,6 +335,7 @@ public class Panel extends JPanel{
         }
         else if(inBaseline){ //in baseline phase, collecting data
             displayPhaseScreen(g);
+            g.drawString("Baseline Phase:", (int) (.045 * getWidth()), (int) (.26 * getHeight()));
 
             if(!baseline.getstartBaseline()){
                 shutPhaseDown();
@@ -345,12 +346,26 @@ public class Panel extends JPanel{
         }
         else if(inLearning){ //in learning phase, collecting data
             displayPhaseScreen(g);
+            g.drawString("Learning Phase: Threshold = " + thresholdControl.getValue(),(int) (.045 * getWidth()), (int) (.26 * getHeight()));
+            g.drawString("In Phase: " + baseline.getPhaseNum() + " / " + baseline.getLearnPhases(),
+                    (int)(.1*getWidth()), (int)(.33*getHeight()));
 
             if(!baseline.getStartLearning()){
                 shutPhaseDown();
             }
 
             /*Display all incoming Data: */
+            displayAllData(g);
+        }
+        else if(inExtinction){
+            displayPhaseScreen(g);
+            g.drawString("Extinction Phase:",(int) (.045 * getWidth()), (int) (.26 * getHeight()));
+
+            if(!baseline.getStartExtinction()){
+                shutPhaseDown();
+            }
+
+            /* Display all incoming data */
             displayAllData(g);
         }
         else{
@@ -379,6 +394,9 @@ public class Panel extends JPanel{
         }
         else if (baseline.getStartLearning()) {
             values = baseline.getLearningData();
+        }
+        else if(baseline.getStartExtinction()){
+            values = baseline.getExtinctionData();
         }
 
         g.setFont(new Font("Courier New", Font.PLAIN, 20));
@@ -422,11 +440,6 @@ public class Panel extends JPanel{
         g.drawString(getTimeString(baseline.getTimerem()), (int) (.42 * this.getWidth()), (int) (.06 * this.getHeight()));
 
         g.setFont(new Font("Courier New", Font.PLAIN, 30));
-        if(inLearning){
-            g.drawString("Learning Phase: Threshold = " + thresholdControl.getValue(),(int) (.045 * getWidth()), (int) (.26 * getHeight()));
-            g.drawString("In Phase: " + baseline.getPhaseNum() + " / " + baseline.getLearnPhases(),
-                    (int)(.1*getWidth()), (int)(.33*getHeight()));
-        }
     }
 
 }
