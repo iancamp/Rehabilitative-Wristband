@@ -14,6 +14,7 @@ import java.util.Collections;
 public class Baselining {
     private LinkedList<DataPoint> baselineData;
     private LinkedList<DataPoint> learningData;
+    private LinkedList<DataPoint> extinctionData;
     private NetworkThread wristbandInterface;
     private float baseline;
     private int threshold;
@@ -22,7 +23,7 @@ public class Baselining {
     private int outliers;
     private boolean startBaseline;
     private boolean startLearning;
-    private boolean garbage;
+    private boolean startExtinction;
     private double startTime;
     private double timeinphase;
     private double minutes;
@@ -41,6 +42,7 @@ public class Baselining {
     public Baselining() {
         baselineData = new LinkedList<DataPoint>();
         learningData = new LinkedList<DataPoint>();
+        extinctionData = new LinkedList<DataPoint>();
         wristbandInterface = new NetworkThread();
         wristbandInterface.start();
         sum = 0;
@@ -50,6 +52,7 @@ public class Baselining {
         outliers = 0;
         startBaseline = false;
         startLearning = false;
+        startExtinction = false;
         baselinetime = 2; //Default time is 2 minutes unless changed.
     }
     
@@ -177,15 +180,26 @@ public class Baselining {
         return baselineData.getLast();
     }
 
+    /**
+     * Returns a boolean representing whether application is in baseline phase.
+     * @return Returns true if in baseline phase.
+     */
     public boolean getstartBaseline() {
         return startBaseline;
     }
 
+    /**
+     * Return a boolean representing whether application is in extinction phase.
+     * @return Returns true if in extinction phase.
+     */
+    public boolean getStartExtinction(){
+    	return startExtinction;
+    }
 
     /**
      * Adds the sum of a list to the baseline's sum and if any point's magnitude is larger than max, sets max to that magnitude
      *
-     * @param list
+     * @param list The current list of unadded baseline points.
      */
     public void updateSumMax(LinkedList<DataPoint> list) {
         for (DataPoint currentPoint : list) {
@@ -194,6 +208,7 @@ public class Baselining {
             } else {
                 sum += currentPoint.getMagnitude();
             }
+            currentPoint.setPhase("Baseline");
         }
     }
 
@@ -204,6 +219,14 @@ public class Baselining {
      */
     public LinkedList<DataPoint> getbaselineData() {
         return baselineData;
+    }
+    
+    /**
+     * Getter for extinctionData
+     * @return The linked list of data from the extinction phase.
+     */
+    public LinkedList<DataPoint> getExtinctionData(){
+    	return extinctionData;
     }
 
     /**
@@ -229,11 +252,17 @@ public class Baselining {
     			phasenum++;
     			endslice+=timeslice;
     		}
-
-
-
     	}
-    	else if (!ispaused){startLearning=false;}}
+    	else if (!ispaused){startLearning=false;}
+    	if (!ispaused && startExtinction && ((System.currentTimeMillis() - startTime) < timeinphase)) {
+    		for (DataPoint currentpoint : temporaryNewData) {
+    			learn(currentpoint);
+    			currentpoint.setPhase("Extinction");
+    		}
+    		extinctionData.addAll(temporaryNewData);
+    		timerem = (minutes - ((System.currentTimeMillis() - startTime) / 60000.0));}
+    	else if (!ispaused){startExtinction=false;}
+    	}
 
     /**
      * Pauses the execution of either phase. Updates time to ensure timing is consistent after pause.
@@ -270,12 +299,33 @@ public class Baselining {
     }
     
     /**
+     * Calls cancel() function and clears all collected data from extinction phase.
+     */
+    public void extinctionCancel(){
+    	cancel();
+    	extinctionData.clear();
+    }
+    
+    /**
      * Cancels the current phase execution and returns to the main screen.
      */
     private void cancel(){
     	ispaused = false;
     	startBaseline = false;
     	startLearning = false;
+    	startExtinction = false;
+    }
+    
+    public void extinctionPhase(double minutes){
+    	 wristbandInterface.resetTime();
+         LinkedList<DataPoint> emptytrash = new LinkedList<DataPoint>();
+         wristbandInterface.copyFromQueue(emptytrash);
+         startExtinction = true;
+         this.minutes = minutes;
+         baselinetime = minutes;
+         timeinphase = (minutes * 60 * 1000);
+         timerem = minutes;
+         startTime = System.currentTimeMillis();
     }
     
 
@@ -322,6 +372,20 @@ public class Baselining {
         phasenum = 1;
         startTime = System.currentTimeMillis();
     }
+    
+    /**
+     * Adds movement value to given data point.
+     * @param currentpoint Baseline data point.
+     */
+    public void learn(DataPoint currentpoint){
+    	 if (currentpoint.getMagnitude() <= 15.0) {
+             currentpoint.setMovement("Low");
+         } else if (currentpoint.getMagnitude() <= threshold) {
+             currentpoint.setMovement("Medium");
+         } else {
+             currentpoint.setMovement("High");
+         }
+    }
 
     /**
      * Adds a movement String to each DataPoint based on its magnitude
@@ -329,13 +393,7 @@ public class Baselining {
      * @param Baseline data
      */
     public void movementLearn(DataPoint currentpoint) {
-        if (currentpoint.getMagnitude() <= 15.0) {
-            currentpoint.setMovement("Low");
-        } else if (currentpoint.getMagnitude() <= threshold) {
-            currentpoint.setMovement("Medium");
-        } else {
-            currentpoint.setMovement("High");
-        }
+        learn(currentpoint);
         currentpoint.setPhase("Learning" + phasenum);
     }
 
