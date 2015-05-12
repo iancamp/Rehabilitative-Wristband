@@ -6,10 +6,7 @@ import javax.swing.event.ChangeListener;
 import javax.swing.text.DefaultFormatter;
 import javax.xml.crypto.Data;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
+import java.awt.event.*;
 import java.util.LinkedList;
 
 /**
@@ -207,6 +204,27 @@ public class Panel extends JPanel{
             }
         });
 
+        /* Create method to resize fonts on window resize */
+        frame.addComponentListener(new ComponentAdapter()
+        {
+            public void componentResized(ComponentEvent evt) {
+                double fontMultiplerWidth = .016;
+                double fontMultiplerHeight = .008;
+
+                int buttonFontSize = (int)(getWidth()*fontMultiplerWidth) + (int)(getHeight()*fontMultiplerHeight);
+
+                timeControl.setFont(new Font("Times New Roman", Font.PLAIN, buttonFontSize));
+                baseliningButton.setFont(new Font("Times New Roman", Font.PLAIN, buttonFontSize));
+                learningButton.setFont(new Font("Times New Roman", Font.PLAIN, buttonFontSize));
+                extinctionButton.setFont(new Font("Times New Roman", Font.PLAIN, buttonFontSize));
+                summaryButton.setFont(new Font("Times New Roman", Font.PLAIN, buttonFontSize));
+                arduinoFail.setFont(new Font("Times New Roman", Font.PLAIN, buttonFontSize));
+                arduinoTimeOut.setFont(new Font("Times New Roman", Font.PLAIN, buttonFontSize));
+                pauseButton.setFont(new Font("Times New Roman", Font.PLAIN, buttonFontSize));
+                cancelButton.setFont(new Font("Times New Roman", Font.PLAIN, buttonFontSize));
+            }
+        });
+
         /*Add all Buttons & Inputs to the Form */
         this.setLayout(null);
         this.add(timeControl);
@@ -392,6 +410,7 @@ public class Panel extends JPanel{
             summaryButton.setBounds((int) (.65 * getWidth()), (int) (.35 * getHeight()), (int) (.25 * getWidth()), (int) (.08 * getHeight()));
             summaryButton.setBounds((int) (.65 * getWidth()), (int) (.35 * getHeight()), (int) (.25 * getWidth()), (int) (.08 * getHeight()));
             thresholdControl.setBounds((int) (.04 * getWidth()), (int) (.24 * getHeight()), (int) (.9 * getWidth()), (int) (.08 * getHeight()));
+
             g.setFont(new Font("Times New Roman", Font.PLAIN, mediumTextSize));
             if(baseline.getbaselineData().size() > 0){
                 g.drawString("Suggested Threshold: " + suggestedThreshold, (int) (.05 * getWidth()), (int) (.42 * getHeight()));
