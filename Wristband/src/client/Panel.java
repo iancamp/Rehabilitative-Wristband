@@ -40,6 +40,10 @@ public class Panel extends JPanel{
     private JButton arduinoFail;
     private JButton arduinoTimeOut;
 
+    private static int largeTextSize = 36;
+    private static int mediumTextSize = 30;
+    private static int smallTextSize = 22;
+
     private JButton pauseButton;
     private JButton cancelButton;
 
@@ -67,7 +71,7 @@ public class Panel extends JPanel{
 
         /* Create Spinner for control over the length of each phase */
         timeControl = new JSpinner(new SpinnerNumberModel(2,-Double.MAX_VALUE,Double.MAX_VALUE,.5));
-        timeControl.setFont(new Font("Courier New", Font.PLAIN, 20));
+        timeControl.setFont(new Font("Courier New", Font.PLAIN, smallTextSize));
         /* Create constraints on input of Time Controller */
         JComponent comp = timeControl.getEditor();
         JFormattedTextField field = (JFormattedTextField) comp.getComponent(0);
@@ -320,21 +324,30 @@ public class Panel extends JPanel{
             else if(seconds%4 == 2){
                 loadDots = "...";
             }
-            g.setFont(new Font("Times New Roman", Font.PLAIN, 40));
+            g.setFont(new Font("Times New Roman", Font.PLAIN, largeTextSize));
             g.drawString("Loading" + loadDots, (int) (.25 * getWidth()), (int) (.4 * getHeight()));
+            g.setFont(new Font("Times New Roman", Font.PLAIN, smallTextSize));
+            g.drawString("Make sure the Aduino is turned on.", (int) (.35 * getWidth()), (int) (.5 * getHeight()));
         }
         else if(foundCom < 0){ //failed to find Ardiuno
-            g.setFont(new Font("Times New Roman", Font.BOLD, 50));
+            g.setFont(new Font("Times New Roman", Font.BOLD, largeTextSize));
             g.drawString("Failed to find Arduino!", (int) (.25 * getWidth()), (int) (.4 * getHeight()));
+            g.setFont(new Font("Times New Roman", Font.PLAIN, smallTextSize));
+            g.drawString("Please make sure the Arduino is connected and retry", (int) (.22 * getWidth()), (int) (.48 * getHeight()));
             arduinoFail.setVisible(true);
             arduinoFail.setBounds((int) (.25 * getWidth()), (int) (.55 * getHeight()), (int) (.35 * getWidth()), (int) (.13 * getHeight()));
         }
         else if(networkThread.getTimeOut()){
+            g.setFont(new Font("Times New Roman", Font.BOLD, largeTextSize));
+            g.drawString("The connection with the Arduino was lost.", (int) (.2 * getHeight()), (int) (.2 * getWidth()));
+            g.setFont(new Font("Times New Roman", Font.PLAIN, smallTextSize));
+            g.drawString("Please make sure the Arduino is connected and retry", (int) (.2 * getHeight()), (int) (.3 * getWidth()));
             arduinoTimeOut.setBounds((int) (.25 * getWidth()), (int) (.55 * getHeight()), (int) (.35 * getWidth()), (int) (.13 * getHeight()));
             arduinoTimeOut.setVisible(true);
         }
         else if(inBaseline){ //in baseline phase, collecting data
             displayPhaseScreen(g);
+            g.setFont(new Font("Courier New", Font.PLAIN, mediumTextSize));
             g.drawString("Baseline Phase:", (int) (.045 * getWidth()), (int) (.26 * getHeight()));
 
             if(!baseline.getstartBaseline()){
@@ -346,6 +359,7 @@ public class Panel extends JPanel{
         }
         else if(inLearning){ //in learning phase, collecting data
             displayPhaseScreen(g);
+            g.setFont(new Font("Courier New", Font.PLAIN, mediumTextSize));
             g.drawString("Learning Phase: Threshold = " + thresholdControl.getValue(),(int) (.045 * getWidth()), (int) (.26 * getHeight()));
             g.drawString("In Phase: " + baseline.getPhaseNum() + " / " + baseline.getLearnPhases(),
                     (int)(.1*getWidth()), (int)(.33*getHeight()));
@@ -359,6 +373,7 @@ public class Panel extends JPanel{
         }
         else if(inExtinction){
             displayPhaseScreen(g);
+            g.setFont(new Font("Courier New", Font.PLAIN, mediumTextSize));
             g.drawString("Extinction Phase:",(int) (.045 * getWidth()), (int) (.26 * getHeight()));
 
             if(!baseline.getStartExtinction()){
@@ -370,15 +385,19 @@ public class Panel extends JPanel{
         }
         else{
             /* Reset all buttons and inputs if window was resized */
-            timeControl.setBounds((int) (.2 * getWidth()), (int) (.02 * getHeight()), (int) (.6 * getWidth()), (int) (.07 * getHeight()));
+            timeControl.setBounds((int) (.52 * getWidth()), (int) (.02 * getHeight()), (int) (.3 * getWidth()), (int) (.07 * getHeight()));
             baseliningButton.setBounds((int) (.05 * getWidth()), (int) (.1 * getHeight()), (int) (.30 * getWidth()), (int) (.1 * getHeight()));
             learningButton.setBounds((int) (.35 * getWidth()), (int) (.1 * getHeight()), (int) (.30 * getWidth()), (int) (.1 * getHeight()));
             extinctionButton.setBounds((int) (.65 * getWidth()), (int) (.1 * getHeight()), (int) (.30 * getWidth()), (int) (.1 * getHeight()));
             summaryButton.setBounds((int) (.65 * getWidth()), (int) (.35 * getHeight()), (int) (.25 * getWidth()), (int) (.08 * getHeight()));
             summaryButton.setBounds((int) (.65 * getWidth()), (int) (.35 * getHeight()), (int) (.25 * getWidth()), (int) (.08 * getHeight()));
             thresholdControl.setBounds((int) (.04 * getWidth()), (int) (.24 * getHeight()), (int) (.9 * getWidth()), (int) (.08 * getHeight()));
-            g.setFont(new Font("Times New Roman", Font.PLAIN, 32));
-            g.drawString("Suggested Threshold: " + suggestedThreshold, (int) (.05 * getWidth()), (int) (.42 * getHeight()));
+            g.setFont(new Font("Times New Roman", Font.PLAIN, mediumTextSize));
+            if(baseline.getbaselineData().size() > 0){
+                g.drawString("Suggested Threshold: " + suggestedThreshold, (int) (.05 * getWidth()), (int) (.42 * getHeight()));
+            }
+            g.setFont(new Font("Times New Roman", Font.PLAIN, smallTextSize));
+            g.drawString("Length of Phase (in minutes):",(int) (.18 * getWidth()), (int) (.07 * getHeight()));
             revalidate();
         }
     }
@@ -399,7 +418,7 @@ public class Panel extends JPanel{
             values = baseline.getExtinctionData();
         }
 
-        g.setFont(new Font("Courier New", Font.PLAIN, 20));
+        g.setFont(new Font("Courier New", Font.PLAIN, smallTextSize));
         g.drawString("Time: Data:", (int) (.03 * this.getWidth()), (int) (.4 * this.getHeight()));
         if(inBaseline){
             g.drawString("Sum:", (int) (.25 * this.getWidth()), (int) (.4 * this.getHeight()));
@@ -435,11 +454,9 @@ public class Panel extends JPanel{
         pauseButton.setBounds((int) (.05 * getWidth()), (int) (.1 * getHeight()), (int) (.42 * getWidth()), (int) (.1 * getHeight()));
         cancelButton.setBounds((int) (.5 * getWidth()), (int) (.1 * getHeight()), (int) (.42 * getWidth()), (int) (.1 * getHeight()));
 
-        g.setFont(new Font("Courier New", Font.PLAIN, 26));
+        g.setFont(new Font("Courier New", Font.PLAIN, smallTextSize));
         Double t = (Double)(timeControl.getValue());
         g.drawString(getTimeString(baseline.getTimerem()), (int) (.42 * this.getWidth()), (int) (.06 * this.getHeight()));
-
-        g.setFont(new Font("Courier New", Font.PLAIN, 30));
     }
 
 }
