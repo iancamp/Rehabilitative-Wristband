@@ -22,12 +22,17 @@ public class Panel extends JPanel{
 
     private boolean inBaseline;
     private boolean inLearning;
+    private boolean inExtinction;
     private int suggestedThreshold;
 
-    private double maxTime = 20;
-    private double minTime = .5;
+    private static double maxTime = 20;
+    private static double minTime = .5;
+    private static int maxThreshold = 999;
+
     private JButton baseliningButton;
     private JButton learningButton;
+    private JButton extinctionButton;
+
     private JButton summaryButton;
     private JSlider thresholdControl;
     private JSpinner timeControl;
@@ -45,6 +50,7 @@ public class Panel extends JPanel{
         timeControl.setVisible(!timeControl.isVisible());
         baseliningButton.setVisible(!baseliningButton.isVisible());
         learningButton.setVisible(!learningButton.isVisible());
+        extinctionButton.setVisible(!extinctionButton.isVisible());
         thresholdControl.setVisible(!thresholdControl.isVisible());
         summaryButton.setVisible(!summaryButton.isVisible());
         pauseButton.setVisible(!pauseButton.isVisible());
@@ -57,6 +63,7 @@ public class Panel extends JPanel{
         networkThread = baseline.getWristbandInterface();
         inBaseline = false;
         inLearning = false;
+        inExtinction = false;
 
         /* Create Spinner for control over the length of each phase */
         timeControl = new JSpinner(new SpinnerNumberModel(2,-Double.MAX_VALUE,Double.MAX_VALUE,.5));
@@ -80,10 +87,10 @@ public class Panel extends JPanel{
             public void actionPerformed(ActionEvent evt) {
                 inBaseline = true;
                 constraintTimeInput();
-                getBaseline().setAllThresholds(999); //set threshold very high to stop toy from activing during baseline
+                getBaseline().setAllThresholds(maxThreshold); //set threshold very high to stop toy from activing during baseline
                 toggleAllVisible();
 
-                getBaseline().baselinePhase((Double)(timeControl.getValue()));
+                getBaseline().baselinePhase((Double) (timeControl.getValue()));
 
             }
         });
@@ -97,7 +104,20 @@ public class Panel extends JPanel{
                 toggleAllVisible();
 
                 getBaseline().setAllThresholds(thresholdControl.getValue()); //send threshold before starting
-                getBaseline().learningPhase((Double)timeControl.getValue());
+                getBaseline().learningPhase((Double) timeControl.getValue());
+
+            }
+        });
+
+        /* Create Extinction Phase Button & Implementation */
+        extinctionButton = new JButton("Extinction Button");
+        extinctionButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent evt) {
+//                inExtinction = true;
+//                constraintTimeInput();
+//                toggleAllVisible();
+
+                //TODO: implement extinction phase
 
             }
         });
@@ -128,6 +148,9 @@ public class Panel extends JPanel{
                     }
                     if(inLearning){
                         getBaseline().learningCancel();
+                    }
+                    if(inExtinction){
+                        //TODO: cancel extinction
                     }
                     shutPhaseDown();
                 }
@@ -185,6 +208,7 @@ public class Panel extends JPanel{
         this.add(timeControl);
         this.add(baseliningButton);
         this.add(learningButton);
+        this.add(extinctionButton);
         this.add(summaryButton);
         this.add(thresholdControl);
         this.add(arduinoFail);
@@ -257,6 +281,7 @@ public class Panel extends JPanel{
         }
         inBaseline = false;
         inLearning = false;
+        inExtinction = false;
         toggleAllVisible();
     }
 
@@ -331,8 +356,9 @@ public class Panel extends JPanel{
         else{
             /* Reset all buttons and inputs if window was resized */
             timeControl.setBounds((int) (.2 * getWidth()), (int) (.02 * getHeight()), (int) (.6 * getWidth()), (int) (.07 * getHeight()));
-            baseliningButton.setBounds((int) (.05 * getWidth()), (int) (.1 * getHeight()), (int) (.42 * getWidth()), (int) (.1 * getHeight()));
-            learningButton.setBounds((int) (.5 * getWidth()), (int) (.1 * getHeight()), (int) (.42 * getWidth()), (int) (.1 * getHeight()));
+            baseliningButton.setBounds((int) (.05 * getWidth()), (int) (.1 * getHeight()), (int) (.30 * getWidth()), (int) (.1 * getHeight()));
+            learningButton.setBounds((int) (.35 * getWidth()), (int) (.1 * getHeight()), (int) (.30 * getWidth()), (int) (.1 * getHeight()));
+            extinctionButton.setBounds((int) (.65 * getWidth()), (int) (.1 * getHeight()), (int) (.30 * getWidth()), (int) (.1 * getHeight()));
             summaryButton.setBounds((int) (.65 * getWidth()), (int) (.35 * getHeight()), (int) (.25 * getWidth()), (int) (.08 * getHeight()));
             summaryButton.setBounds((int) (.65 * getWidth()), (int) (.35 * getHeight()), (int) (.25 * getWidth()), (int) (.08 * getHeight()));
             thresholdControl.setBounds((int) (.04 * getWidth()), (int) (.24 * getHeight()), (int) (.9 * getWidth()), (int) (.08 * getHeight()));
