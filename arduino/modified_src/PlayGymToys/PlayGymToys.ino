@@ -56,6 +56,9 @@ void loop()
         analogWrite(motorPin, 255); //turns the motor on to maximum speed
         digitalWrite(musicPin, HIGH); //turns the music on
       }
+      else if (intint > 15){
+        analogWrite(motorPin, 200); //In medium movement case, motor at less than maximum speed
+      }
       else {
         analogWrite(motorPin, 0); //turns the motor off
         digitalWrite(musicPin, LOW); //turns the music off
