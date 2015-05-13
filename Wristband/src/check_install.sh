@@ -6,7 +6,10 @@ if [[ ! -d /var/lock || \
 ! $(ls -l /var/lock | awk -v col=4 '{print $col}') = "uucp" || \
 ! $(stat -f %Mp%Lp /var/lock) = "0775" || \
 -z $(dscl . -read /Groups/_uucp GroupMembership | grep -o $USER) ]]; then
-	/usr/bin/osascript -e 'do shell script "./install.sh $USER" with administrator privileges'
+	#/usr/bin/osascript -e 'do shell script "./install.sh $USER" with administrator privileges'
+	echo "Please run the install script!"
+else
+	echo "Installed!"
 fi
 
 #need to insert "open" command statement here once we know name of executable

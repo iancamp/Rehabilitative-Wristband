@@ -1,6 +1,7 @@
 #!/bin/bash
 #make necessary changes to the file system so the host interfaces with an arduino correctly
-
+#Derived from the "Mac OS X Locking" section at: http://playground.arduino.cc/interfacing/java
+#This script MUST be run as root and given a username as an arguement (in terminal "sudo  <path to this file>  <your username>" where <path to this file> could be soemthing like /Users/iancamp/Desktop/install.sh 
 USER1=$1
 
 echo "$USER1"
