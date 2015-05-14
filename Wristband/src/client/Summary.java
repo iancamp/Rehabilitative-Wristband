@@ -2,10 +2,7 @@ package client;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
+import java.awt.event.*;
 
 /**
  * Created by Henry on 4/15/2015.
@@ -15,6 +12,8 @@ public class Summary extends JPanel {
     private Baselining baseline;
 
     private JButton saveButton;
+    private JButton deleteDataButton;
+    private int buttonFontSize = 22;
 
     private int startingWidth = 600;
     private int startingHeight = 400;
@@ -35,6 +34,7 @@ public class Summary extends JPanel {
         windowOpen = true;
 
         saveButton = new JButton("Save Data");
+        saveButton.setFont(new Font("Times New Roman", Font.PLAIN, buttonFontSize));
         saveButton.setVisible(true);
         saveButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent evt) {
@@ -47,7 +47,16 @@ public class Summary extends JPanel {
                         null,
                         null,
                         "ID");
-                FileManager.saveToCSV(getBaseline(),id);
+                FileManager.saveToCSV(getBaseline(), id);
+            }
+        });
+
+        deleteDataButton = new JButton("Delete All Data");
+        deleteDataButton.setFont(new Font("Times New Roman", Font.PLAIN, buttonFontSize));
+        deleteDataButton.setVisible(true);
+        deleteDataButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent evt) {
+                //TODO: delete errything
             }
         });
 
@@ -57,8 +66,19 @@ public class Summary extends JPanel {
             }
         });
 
+        /* Create method to resize fonts on window resize */
+        frame.addComponentListener(new ComponentAdapter() {
+            public void componentResized(ComponentEvent evt) {
+                buttonFontSize = (int) (getWidth() * .022) + (int) (getHeight() * .01);
+                if (buttonFontSize < 12) {
+                    buttonFontSize = 12;
+                }
+            }
+        });
+
         this.setLayout(null);
         this.add(saveButton);
+        this.add(deleteDataButton);
 
         frame.getContentPane().add(this);
         frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
@@ -68,6 +88,8 @@ public class Summary extends JPanel {
         frame.setVisible(true);
         frame.setTitle("Summary");
         frame.setBackground(Color.white);
+
+        frame.setMinimumSize(new Dimension(400, 300));
     }
 
     /**
@@ -89,12 +111,16 @@ public class Summary extends JPanel {
     public void paint (Graphics g) {
     	super.paint(g);
         g.setFont(new Font("Courier New", Font.BOLD, 22));
-        g.drawString("Low",(int)(.1*getWidth()),(int)(.3*getHeight()));
+        g.drawString("Low", (int) (.1 * getWidth()), (int) (.3 * getHeight()));
         g.drawString("Medium", (int) (.25 * getWidth()),(int) (.3 * getHeight()));
         g.drawString("High", (int)(.45*getWidth()),(int) (.3 * getHeight()));
         g.drawString("Baseline",(int)(.6*getWidth()),(int)(.3*getHeight()));
 
-        saveButton.setBounds((int)(this.getWidth()*.12),(int)(this.getHeight()*.05),(int)(this.getWidth()*.30),(int)(this.getHeight()*.15));
+        saveButton.setFont(new Font("Times New Roman", Font.PLAIN, buttonFontSize));
+        saveButton.setBounds((int) (this.getWidth() * .12), (int) (this.getHeight() * .05), (int) (this.getWidth() * .30), (int) (this.getHeight() * .15));
+
+        deleteDataButton.setFont(new Font("Times New Roman", Font.PLAIN, buttonFontSize));
+        deleteDataButton.setBounds((int) (this.getWidth() * .52), (int) (this.getHeight() * .05), (int) (this.getWidth() * .30), (int) (this.getHeight() * .15));
 
         g.setFont(new Font("Courier New", Font.PLAIN, 20));
 
