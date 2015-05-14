@@ -1,5 +1,8 @@
 package client;
-
+import gnu.io.CommPortIdentifier;
+import gnu.io.SerialPort;
+import gnu.io.SerialPortEvent;
+import gnu.io.SerialPortEventListener;
 import java.awt.LayoutManager;
 import java.awt.*;
 import javax.swing.*;

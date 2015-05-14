@@ -5,7 +5,7 @@ import client.DataPoint;
 
 import org.junit.Assert;
 
-import static junit.framework.Assert.assertEquals;
+
 
 /**
  * Created by magic_000 on 4/14/2015.
@@ -28,5 +28,5 @@ public class BaseliningTest extends Baselining {
 
 
 }*/
-
+    }
 }
