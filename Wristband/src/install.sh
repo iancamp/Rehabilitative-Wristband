@@ -12,7 +12,7 @@ if [[ ! -d /var/lock ]]; then
 fi
 
 #Change group permissions on /var/lock to uucp
-if [[ ! $(ls -l /var/lock | awk -v col=4 '{print $col}') = "uucp" ]]; then
+if [[ ! $(ls -l /var/lock | awk -v col=4 '{print $col}') = "_uucp" ]]; then
 	echo "chgrp uucp /var/lock"
 fi
 
