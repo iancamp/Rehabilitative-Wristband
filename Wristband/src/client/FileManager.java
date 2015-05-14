@@ -26,15 +26,17 @@ public final class FileManager{
 	 *@param id: The id of the baby which will be put at the top of the file
 	 */
 	public static void saveToCSV(Baselining b, String id){
-		LinkedList<DataPoint> baselineData = b.getbaselineData(); //get the list of data
-		LinkedList<DataPoint> learningData = b.getLearningData();
 		DataPoint dp; //the current data point in the list
-		DataPoint dpLearning;
 		FileWriter fw;
 		BufferedWriter bw;
 		String fileName = generateFileName(id); //create a unique filename 
 		File file = new File(SAVE_DIRECTORY + fileName); //create a file reference
-
+		DateFormat timeFmt = new SimpleDateFormat("HH:mm");
+		DateFormat dateFmt = new SimpleDateFormat("yyyy-MM-dd");
+		Date timeDate = new Date();
+		String time = timeFmt.format(timeDate);
+		String date = dateFmt.format(timeDate);
+		
 		try{
 			if(!file.exists())
 				file.createNewFile(); //create the file if it does not exist (it shouldn't)
@@ -43,30 +45,57 @@ public final class FileManager{
 			bw = new BufferedWriter(fw);
 
 			//put name,date,time at the top of the file
-			bw.write("ID,date,time,threshold\n");
-			bw.write(fileName.replace("_",",").replace(".csv","") + "," + b.getThreshold() + "\n\n\n");
-
-			bw.write("Baseline phase,,,,Learning phase\n");
-			bw.write("time,magnitude,,,time,magnitude,movement\n");
-			//loop through list of data and write to csv file
-			ListIterator<DataPoint> liLearning = learningData.listIterator();
-			ListIterator<DataPoint> li = baselineData.listIterator();
+			bw.write("ID,date,startTime,threshold,phase,currentTime,magnitude,movement\n");
+			
+			
+			//loop through list of data and write to csv file:
+			
+			//baseline loop
+			ListIterator<DataPoint> li = b.getbaselineData().listIterator();
 			while(li.hasNext()){
 				dp = li.next();
-				if(liLearning.hasNext()){
-					dpLearning = liLearning.next();
-
-					bw.write(dp.getTime() + "," + dp.getMagnitude() + ",,," + dpLearning.getTime() + "," + dpLearning.getMagnitude() + "," + dpLearning.getMovement() + "\n"); //write to file
-				}
-				else
-					bw.write(dp.getTime() + "," + dp.getMagnitude() + "\n"); //write to file
-
+				bw.write(
+						id + "," +
+						date + "," +
+						time + "," +
+						b.getThreshold() + "," +
+						dp.getPhase() + "," +
+						dp.getTime() + "," +
+						dp.getMagnitude() + "," +
+						dp.getMovement() + "\n"
+						);	
+			}
+			
+			//learning phase loop
+			li = b.getLearningData().listIterator();
+			while(li.hasNext()){
+				dp = li.next();
+				bw.write(
+						id + "," +
+						date + "," +
+						time + "," +
+						b.getThreshold() + "," +
+						dp.getPhase() + "," +
+						dp.getTime() + "," +
+						dp.getMagnitude() + "," +
+						dp.getMovement() + "\n"
+						);	
 			}
 
-
-			while(liLearning.hasNext()){
-				dp = liLearning.next();
-				bw.write(",,,," + dp.getTime() + "," + dp.getMagnitude() + "," + dp.getMovement() + "\n"); //write to file
+			//extinction phase loop
+			li = b.getExtinctionData().listIterator();
+			while(li.hasNext()){
+				dp = li.next();
+				bw.write(
+						id + "," +
+						date + "," +
+						time + "," +
+						b.getThreshold() + "," +
+						dp.getPhase() + "," +
+						dp.getTime() + "," +
+						dp.getMagnitude() + "," +
+						dp.getMovement() + "\n"
+						);	
 			}
 
 			bw.close();
@@ -78,7 +107,7 @@ public final class FileManager{
 
 	/**
 	 *Generates a filename for a new csv file
-	 *Format: <Baby id>_<yyyy-mm-dd>_<hh-mm>.csv
+	 *Format: Baby id_yyyy-mm-dd_hh-mm.csv
 	 *@param id The id of the baby which will be a part of the file name
 	 *@return fileName A filename matching the above format
 	 */
