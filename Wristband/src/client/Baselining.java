@@ -299,9 +299,9 @@ public class Baselining {
     	}
     	int s = baselineData.size();
     	if (s > 0){
-    		low[0] = Math.floor(lowcount/s*100)/100;
-    		medium[0] = Math.floor(mediumcount/s*100)/100;
-    		high[0] = Math.floor(highcount/s*100)/100;
+    		low[0] = Math.floor(100*lowcount/s)/100;
+    		medium[0] = Math.floor(100*mediumcount/s)/100;
+    		high[0] = Math.floor(100*highcount/s)/100;
     	}
     }
 
