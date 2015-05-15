@@ -34,6 +34,13 @@ public class Baselining {
     private double endslice; //When current slice of learning phase will end
     private double pausetime; //Time at the time of a pause event.
     private boolean ispaused; //Whether or not the program is in a paused state.
+    private double[] low; //Low occurrences for all three phases as percentages.
+    private double[] high; //High occurrences for all three phases as percentages.
+    private double[] medium; //Medium occurrences for all three phases as percentages.
+    private double[] lowcount;
+    private double[] mediumcount;
+    private double[] highcount;
+    
 
 
     /**
@@ -53,7 +60,47 @@ public class Baselining {
         startBaseline = false;
         startLearning = false;
         startExtinction = false;
+        low = new double[3];
+        high = new double[3];
+        medium = new double[3];
+        lowcount = new double[2];
+        mediumcount = new double[2];
+        highcount = new double[2];
+        for (int i = 0; i < 3; i++){
+        	low[i] = 0;
+        	high[i] = 0;
+        	medium[i] = 0;
+        }
+        for (int i = 0; i < 2; i++){
+        	lowcount[i] = 0;
+        	mediumcount[i] = 0;
+        	highcount[i] = 0;
+        }
         baselinetime = 2; //Default time is 2 minutes unless changed.
+    }
+    
+    /**
+     * Returns an array representing the low percentages for each phase.
+     * @return 0, 1, and 2 in the array are percentages for baseline, learning, and extinction, respectively.
+     */
+    public double[] getLowPercentages(){
+    	return low;
+    }
+    
+    /**
+     * Returns an array representing the medium percentages for each phase.
+     * @return 0, 1, and 2 in the array are percentages for baseline, learning, and extinction, respectively.
+     */
+    public double[] getMediumPercentages(){
+    	return medium;
+    }
+    
+    /**
+     * Returns an array representing the high percentages for each phase.
+     * @return 0, 1, and 2 in the array are percentages for baseline, learning, and extinction, respectively.
+     */
+    public double[] getHighPercentages(){
+    	return high;
     }
     
     /**
@@ -228,6 +275,35 @@ public class Baselining {
     public LinkedList<DataPoint> getExtinctionData(){
     	return extinctionData;
     }
+    
+    /**
+     * Calculates percentages for Baseline Phase and puts high/med/low into data points for that phase.
+     */
+    public void baselineBackCalculate(){
+    	int highcount = 0;
+    	int lowcount = 0;
+    	int mediumcount = 0;
+    	for (DataPoint p : baselineData){
+    		if (p.getMagnitude() > threshold){
+    			p.setMovement("high");
+    			highcount++;
+    		}
+    		else if (p.getMagnitude() < 15){
+    			p.setMovement("low");
+    			lowcount++;
+    		}
+    		else {
+    			p.setMovement("medium");
+    			mediumcount++;
+    		}
+    	}
+    	int s = baselineData.size();
+    	if (s > 0){
+    		low[0] = lowcount/s;
+    		medium[0] = mediumcount/s;
+    		high[0] = highcount/s;
+    	}
+    }
 
     /**
      * Gets newest data point from wristband, adds the data point to the list of
@@ -241,25 +317,30 @@ public class Baselining {
     		baselineData.addAll(temporaryNewData);
     		baseline = sum / (baselineData.size() - outliers);
     		timerem = (minutes - ((System.currentTimeMillis() - startTime) / 60000.0));}
-    	else if (!ispaused){startBaseline=false;}
+    	else if (!ispaused && startBaseline){
+    		startBaseline=false;
+    	}
 
     	if (!ispaused && startLearning && ((System.currentTimeMillis() - startTime) < timeinphase)) {
+    		learningData.addAll(temporaryNewData);
     		for (DataPoint currentpoint : temporaryNewData) {
     			movementLearn(currentpoint);}
-    		learningData.addAll(temporaryNewData);
     		timerem = (minutes - ((System.currentTimeMillis() - startTime) / 60000.0));
     		if (minutes - timerem > endslice){
     			phasenum++;
     			endslice+=timeslice;
     		}
     	}
-    	else if (!ispaused){startLearning=false;}
+    	else if (!ispaused && startLearning){
+    		
+    		startLearning=false;
+    		}
     	if (!ispaused && startExtinction && ((System.currentTimeMillis() - startTime) < timeinphase)) {
+    		extinctionData.addAll(temporaryNewData);
     		for (DataPoint currentpoint : temporaryNewData) {
     			learn(currentpoint);
     			currentpoint.setPhase("Extinction");
     		}
-    		extinctionData.addAll(temporaryNewData);
     		timerem = (minutes - ((System.currentTimeMillis() - startTime) / 60000.0));}
     	else if (!ispaused){startExtinction=false;}
     	}
@@ -284,6 +365,12 @@ public class Baselining {
     public void learningCancel(){
     	cancel();
     	learningData.clear();
+    	high[1] = 0;
+    	medium[1] = 0;
+    	low[1] = 0;
+    	highcount[0] = 0;
+    	mediumcount[0] = 0;
+    	lowcount[0] = 0;
     }
     
     /**
@@ -296,6 +383,9 @@ public class Baselining {
         baseline = 0;
         timerem = 0;
         outliers = 0;
+        high[0] = 0;
+        medium[0] = 0;
+        low[0] = 0;
     }
     
     /**
@@ -304,6 +394,12 @@ public class Baselining {
     public void extinctionCancel(){
     	cancel();
     	extinctionData.clear();
+    	high[2] = 0;
+    	medium[2] = 0;
+    	low[2] = 0;
+    	highcount[1] = 0;
+    	mediumcount[1] = 0;
+    	lowcount[1] = 0;
     }
     
     /**
@@ -353,6 +449,7 @@ public class Baselining {
      * @param minutes for the learning phase
      */
     public void learningPhase(double minutes) {
+    	baselineBackCalculate();
         wristbandInterface.resetTime();
         LinkedList<DataPoint> emptytrash = new LinkedList<DataPoint>();
         wristbandInterface.copyFromQueue(emptytrash);
@@ -374,17 +471,40 @@ public class Baselining {
     }
     
     /**
-     * Adds movement value to given data point.
+     * Adds movement value to given data point. Also calculates high/med/low percentages
      * @param currentpoint Baseline data point.
      */
     public void learn(DataPoint currentpoint){
-    	 if (currentpoint.getMagnitude() <= 15.0) {
-             currentpoint.setMovement("Low");
-         } else if (currentpoint.getMagnitude() <= threshold) {
-             currentpoint.setMovement("Medium");
-         } else {
-             currentpoint.setMovement("High");
-         }
+    	if (startLearning){
+    		if (currentpoint.getMagnitude() <= 15.0) {
+    			currentpoint.setMovement("Low");
+    			lowcount[0]++;
+    		} else if (currentpoint.getMagnitude() <= threshold) {
+    			currentpoint.setMovement("Medium");
+    			mediumcount[0]++;
+    		} else {
+    			currentpoint.setMovement("High");
+    			highcount[0]++;
+    		}
+    		low[1] = lowcount[0]/learningData.size();
+			medium[1] = mediumcount[0]/learningData.size();
+			high[1] = highcount[0]/learningData.size();
+    	}
+    	else { //Else extinction phase
+    		if (currentpoint.getMagnitude() <= 15.0) {
+    			currentpoint.setMovement("Low");
+    			lowcount[1]++;
+    		} else if (currentpoint.getMagnitude() <= threshold) {
+    			currentpoint.setMovement("Medium");
+    			mediumcount[1]++;
+    		} else {
+    			currentpoint.setMovement("High");
+    			highcount[1]++;
+    		}
+    		low[2] = lowcount[1]/extinctionData.size();
+			medium[2] = mediumcount[1]/extinctionData.size();
+			high[2] = highcount[1]/extinctionData.size();
+    	}
     }
 
     /**
