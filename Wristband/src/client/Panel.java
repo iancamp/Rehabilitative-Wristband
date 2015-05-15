@@ -59,6 +59,15 @@ public class Panel extends JPanel{
         cancelButton.setVisible(!cancelButton.isVisible());
     }
 
+    private void changePause(JButton button){
+        if(button.getText().equalsIgnoreCase("pause")){
+            button.setText("Unpause");
+        }
+        else if(button.getText().equalsIgnoreCase("unpause")){
+            button.setText("Pause");
+        }
+    }
+
     public Panel(JFrame frame, Baselining baseline) {
         this.frame = frame;
         this.baseline = baseline;
@@ -129,6 +138,7 @@ public class Panel extends JPanel{
         pauseButton.setVisible(false);
         pauseButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent evt) {
+                changePause(pauseButton);
                 getBaseline().pause();
             }
         });
