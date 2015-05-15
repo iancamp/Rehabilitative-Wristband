@@ -96,12 +96,25 @@ public class Panel extends JPanel{
         baseliningButton = new JButton("Start Baselining Phase");
         baseliningButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent evt) {
-                inBaseline = true;
-                constraintTimeInput();
-                getBaseline().setAllThresholds(maxThreshold); //set threshold very high to stop toy from activing during baseline
-                toggleAllVisible();
+                if(getBaseline().getbaselineData().size() > 0){
+                    int answer = JOptionPane.showConfirmDialog(
+                            getFrame(),
+                            "Previous Baseline Phase will be Lost. \n Proceed?",
+                            "Begin Phase",
+                            JOptionPane.YES_NO_OPTION);
 
-                getBaseline().baselinePhase((Double) (timeControl.getValue()));
+                    if(answer == 0){    //JOptionPane returns 0 when user selects Yes
+                        getBaseline().baselineCancel();
+                    }
+                }
+                if(getBaseline().getbaselineData().size() == 0){
+                    inBaseline = true;
+                    constraintTimeInput();
+                    getBaseline().setAllThresholds(maxThreshold); //set threshold very high to stop toy from activing during baseline
+                    toggleAllVisible();
+
+                    getBaseline().baselinePhase((Double) (timeControl.getValue()));
+                }
 
             }
         });
@@ -110,13 +123,25 @@ public class Panel extends JPanel{
         learningButton = new JButton("Start Learning Phase");
         learningButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent evt) {
-                inLearning = true;
-                constraintTimeInput();
-                toggleAllVisible();
+                if(getBaseline().getLearningData().size() > 0){
+                    int answer = JOptionPane.showConfirmDialog(
+                            getFrame(),
+                            "Previous Learning Phase will be Lost. \n Proceed?",
+                            "Begin Phase",
+                            JOptionPane.YES_NO_OPTION);
 
-                getBaseline().setAllThresholds(thresholdControl.getValue()); //send threshold before starting
-                getBaseline().learningPhase((Double) timeControl.getValue());
+                    if(answer == 0){    //JOptionPane returns 0 when user selects Yes
+                        getBaseline().learningCancel();
+                    }
+                }
+                if(getBaseline().getLearningData().size() == 0){
+                    inLearning = true;
+                    constraintTimeInput();
+                    toggleAllVisible();
 
+                    getBaseline().setAllThresholds(thresholdControl.getValue()); //send threshold before starting
+                    getBaseline().learningPhase((Double) timeControl.getValue());
+                }
             }
         });
 
@@ -124,12 +149,25 @@ public class Panel extends JPanel{
         extinctionButton = new JButton("Extinction Button");
         extinctionButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent evt) {
-                inExtinction = true;
-                constraintTimeInput();
-                toggleAllVisible();
+                if(getBaseline().getExtinctionData().size() > 0){
+                    int answer = JOptionPane.showConfirmDialog(
+                            getFrame(),
+                            "Previous Extinction Phase will be Lost. \n Proceed?",
+                            "Begin Phase",
+                            JOptionPane.YES_NO_OPTION);
 
-                getBaseline().extinctionPhase((Double) timeControl.getValue());
+                    if(answer == 0){    //JOptionPane returns 0 when user selects Yes
+                        getBaseline().extinctionCancel();
+                    }
+                }
 
+                if(getBaseline().getExtinctionData().size() == 0){
+                    inExtinction = true;
+                    constraintTimeInput();
+                    toggleAllVisible();
+
+                    getBaseline().extinctionPhase((Double) timeControl.getValue());
+                }
             }
         });
 
@@ -361,6 +399,9 @@ public class Panel extends JPanel{
 
         /* Remove threshold slider from GUI if there is any Learning Data */
         if(baseline.getLearningData().size() > 0){
+            thresholdControl.setVisible(false);
+        }
+        if(inBaseline || inLearning || inExtinction){
             thresholdControl.setVisible(false);
         }
 
