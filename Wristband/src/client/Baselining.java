@@ -299,9 +299,9 @@ public class Baselining {
     	}
     	int s = baselineData.size();
     	if (s > 0){
-    		low[0] = lowcount/s;
-    		medium[0] = mediumcount/s;
-    		high[0] = highcount/s;
+    		low[0] = Math.floor(lowcount/s*100)/100;
+    		medium[0] = Math.floor(mediumcount/s*100)/100;
+    		high[0] = Math.floor(highcount/s*100)/100;
     	}
     }
 
@@ -486,9 +486,9 @@ public class Baselining {
     			currentpoint.setMovement("High");
     			highcount[0]++;
     		}
-    		low[1] = lowcount[0]/learningData.size();
-			medium[1] = mediumcount[0]/learningData.size();
-			high[1] = highcount[0]/learningData.size();
+    		low[1] = Math.floor(100*lowcount[0]/learningData.size())/100;
+			medium[1] = Math.floor(100*mediumcount[0]/learningData.size())/100;
+			high[1] = Math.floor(100*highcount[0]/learningData.size())/100;
     	}
     	else { //Else extinction phase
     		if (currentpoint.getMagnitude() <= 15.0) {
@@ -501,9 +501,9 @@ public class Baselining {
     			currentpoint.setMovement("High");
     			highcount[1]++;
     		}
-    		low[2] = lowcount[1]/extinctionData.size();
-			medium[2] = mediumcount[1]/extinctionData.size();
-			high[2] = highcount[1]/extinctionData.size();
+    		low[2] = Math.floor(100*lowcount[1]/extinctionData.size())/100;
+			medium[2] = Math.floor(100*mediumcount[1]/extinctionData.size())/100;
+			high[2] = Math.floor(100*highcount[1]/extinctionData.size())/100;
     	}
     }
 
