@@ -18,25 +18,27 @@ import java.util.ListIterator;
  */
 public final class FileManager{
 
-	private static final String SAVE_DIRECTORY = "./";
+	//private static final String SAVE_DIRECTORY = "./";
 
 	/**
 	 *Save the contents of the {@code Baselining}
 	 *@param b: The {@code Baselining} object holding the data {@code LinkedList}
 	 *@param id: The id of the baby which will be put at the top of the file
+	 *@param path: The file location
 	 */
-	public static void saveToCSV(Baselining b, String id){
+	public static void saveToCSV(Baselining b, String id, String path){
 		DataPoint dp; //the current data point in the list
 		FileWriter fw;
 		BufferedWriter bw;
 		String fileName = generateFileName(id); //create a unique filename 
-		File file = new File(SAVE_DIRECTORY + fileName); //create a file reference
+		File file = new File(path + fileName); //create a file reference
 		DateFormat timeFmt = new SimpleDateFormat("HH:mm");
 		DateFormat dateFmt = new SimpleDateFormat("yyyy-MM-dd");
 		Date timeDate = new Date();
 		String time = timeFmt.format(timeDate);
 		String date = dateFmt.format(timeDate);
 		
+		System.out.println("Saving file...");
 		try{
 			if(!file.exists())
 				file.createNewFile(); //create the file if it does not exist (it shouldn't)
@@ -103,6 +105,8 @@ public final class FileManager{
 		catch (IOException e){
 			e.printStackTrace();
 		}
+		
+		System.out.println("File saved!");
 	}
 
 	/**
