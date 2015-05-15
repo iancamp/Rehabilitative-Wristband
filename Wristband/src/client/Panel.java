@@ -359,6 +359,7 @@ public class Panel extends JPanel{
     public void paint (Graphics g) {
         super.paint(g);
 
+        /* Remove threshold slider from GUI if there is any Learning Data */
         if(baseline.getLearningData().size() > 0){
             thresholdControl.setVisible(false);
         }
@@ -447,7 +448,7 @@ public class Panel extends JPanel{
             thresholdControl.setBounds((int) (.04 * getWidth()), (int) (.24 * getHeight()), (int) (.9 * getWidth()), (int) (.08 * getHeight()));
 
             g.setFont(new Font("Times New Roman", Font.PLAIN, mediumTextSize));
-            if(baseline.getbaselineData().size() > 0){
+            if(baseline.getbaselineData().size() > 0 && baseline.getLearningData().size() == 0){
                 g.drawString("Suggested Threshold: " + suggestedThreshold, (int) (.05 * getWidth()), (int) (.42 * getHeight()));
             }
             g.setFont(new Font("Times New Roman", Font.PLAIN, smallTextSize));
@@ -462,23 +463,39 @@ public class Panel extends JPanel{
      */
     private void displayAllData(Graphics g){
         LinkedList<DataPoint> values = new LinkedList<DataPoint>();
+        int k = 0;
+
         if(baseline.getstartBaseline()){
             values = baseline.getbaselineData();
+            k = 0;
         }
         else if (baseline.getStartLearning()) {
             values = baseline.getLearningData();
+            k = 1;
         }
         else if(baseline.getStartExtinction()){
             values = baseline.getExtinctionData();
+            k = 2;
         }
 
         g.setFont(new Font("Courier New", Font.PLAIN, dataTextSize));
         g.drawString("Time: Data:", (int) (.03 * this.getWidth()), (int) (.4 * this.getHeight()));
+        g.setFont(new Font("Courier New", Font.PLAIN, mediumTextSize));
         if(inBaseline){
             g.drawString("Baseline:", (int) (.28 * this.getWidth()), (int) (.4 * this.getHeight()));
             g.drawString(baseline.getBaseline() + "", (int) (.28 * this.getWidth()), (int) (.4 * this.getHeight()) + 30);
         }
 
+        g.drawString("Low:", (int) (.48 * this.getWidth()), (int) (.4 * this.getHeight()));
+        g.drawString(baseline.getLowPercentages()[k] + "", (int) (.48 * this.getWidth()), (int) (.4 * this.getHeight()) + 30);
+
+        g.drawString("Medium:", (int) (.63 * this.getWidth()), (int) (.4 * this.getHeight()));
+        g.drawString(baseline.getMediumPercentages()[k] + "", (int) (.63 * this.getWidth()), (int) (.4 * this.getHeight()) + 30);
+
+        g.drawString("High:", (int) (.78 * this.getWidth()), (int) (.4 * this.getHeight()));
+        g.drawString(baseline.getHighPercentages()[k] + "", (int) (.78 * this.getWidth()), (int) (.4 * this.getHeight()) + 30);
+
+        g.setFont(new Font("Courier New", Font.PLAIN, dataTextSize));
         LinkedList<DataPoint> top20 = new LinkedList<DataPoint>();
         for (int i = values.size() - 1; i > Math.max(0, values.size() - 20); i--) {
             top20.add(values.get(i));

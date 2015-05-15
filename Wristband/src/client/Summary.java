@@ -56,7 +56,10 @@ public class Summary extends JPanel {
         deleteDataButton.setVisible(true);
         deleteDataButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent evt) {
-                //TODO: delete errything
+                getBaseline().baselineCancel();
+                getBaseline().learningCancel();
+                getBaseline().extinctionCancel();
+                repaint();
             }
         });
 
@@ -110,11 +113,28 @@ public class Summary extends JPanel {
     @Override
     public void paint (Graphics g) {
     	super.paint(g);
-        g.setFont(new Font("Courier New", Font.BOLD, 22));
-        g.drawString("Low", (int) (.1 * getWidth()), (int) (.3 * getHeight()));
-        g.drawString("Medium", (int) (.25 * getWidth()),(int) (.3 * getHeight()));
-        g.drawString("High", (int)(.45*getWidth()),(int) (.3 * getHeight()));
-        g.drawString("Baseline",(int)(.6*getWidth()),(int)(.3*getHeight()));
+        g.setFont(new Font("Times New Roman", Font.BOLD, 22));
+        g.drawString("Low", (int) (.24 * getWidth()), (int) (.3 * getHeight()));
+        g.drawString("Medium", (int) (.39 * getWidth()),(int) (.3 * getHeight()));
+        g.drawString("High", (int) (.59 * getWidth()), (int) (.3 * getHeight()));
+        g.drawString("Baseline", (int) (.8 * getWidth()), (int) (.3 * getHeight()));
+
+        g.setFont(new Font("Times New Roman", Font.PLAIN, 16));
+        g.drawString("Baseline Phase", (int) (.02 * getWidth()), (int) (.45 * getHeight()));
+        g.drawString("Learning Phase", (int) (.02 * getWidth()),(int) (.6 * getHeight()));
+        g.drawString("Extinction Phase", (int)(.02*getWidth()),(int) (.75 * getHeight()));
+
+        g.drawString(baseline.getLowPercentages()[0]+"", (int) (.25 * getWidth()), (int) (.45 * getHeight()));
+        g.drawString(baseline.getMediumPercentages()[0] + "", (int) (.4 * getWidth()), (int) (.45 * getHeight()));
+        g.drawString(baseline.getHighPercentages()[0]+"", (int) (.6 * getWidth()), (int) (.45 * getHeight()));
+
+        g.drawString(baseline.getLowPercentages()[1]+"", (int) (.25 * getWidth()), (int) (.6 * getHeight()));
+        g.drawString(baseline.getMediumPercentages()[1]+"", (int) (.4 * getWidth()), (int) (.6 * getHeight()));
+        g.drawString(baseline.getHighPercentages()[1]+"", (int) (.6 * getWidth()), (int) (.6 * getHeight()));
+
+        g.drawString(baseline.getLowPercentages()[2]+"", (int) (.25 * getWidth()), (int) (.75 * getHeight()));
+        g.drawString(baseline.getMediumPercentages()[2]+"", (int) (.4 * getWidth()), (int) (.75 * getHeight()));
+        g.drawString(baseline.getHighPercentages()[2]+"", (int) (.6 * getWidth()), (int) (.75 * getHeight()));
 
         saveButton.setFont(new Font("Times New Roman", Font.PLAIN, buttonFontSize));
         saveButton.setBounds((int) (this.getWidth() * .12), (int) (this.getHeight() * .05), (int) (this.getWidth() * .30), (int) (this.getHeight() * .15));
@@ -124,7 +144,7 @@ public class Summary extends JPanel {
 
         g.setFont(new Font("Courier New", Font.PLAIN, 20));
 
-        g.drawString(baseline.getBaseline()+"", (int)(.62*this.getWidth()), (int)(.35*this.getHeight())+30);
+        g.drawString(baseline.getBaseline()+"", (int)(.81*this.getWidth()), (int)(.35*this.getHeight())+30);
 
         revalidate();
     }
