@@ -59,6 +59,15 @@ public class Panel extends JPanel{
         cancelButton.setVisible(!cancelButton.isVisible());
     }
 
+    private void changePause(JButton button){
+        if(button.getText().equalsIgnoreCase("pause")){
+            button.setText("Unpause");
+        }
+        else if(button.getText().equalsIgnoreCase("unpause")){
+            button.setText("Pause");
+        }
+    }
+
     public Panel(JFrame frame, Baselining baseline) {
         this.frame = frame;
         this.baseline = baseline;
@@ -129,6 +138,7 @@ public class Panel extends JPanel{
         pauseButton.setVisible(false);
         pauseButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent evt) {
+                changePause(pauseButton);
                 getBaseline().pause();
             }
         });
@@ -349,6 +359,10 @@ public class Panel extends JPanel{
     public void paint (Graphics g) {
         super.paint(g);
 
+        if(baseline.getLearningData().size() > 0){
+            thresholdControl.setVisible(false);
+        }
+
         /*check for Ardiuno on startup */
         int foundCom = networkThread.getFoundCom();
         if(foundCom == 0 && !networkThread.getTimeOut()){ //still searching
@@ -461,12 +475,8 @@ public class Panel extends JPanel{
         g.setFont(new Font("Courier New", Font.PLAIN, dataTextSize));
         g.drawString("Time: Data:", (int) (.03 * this.getWidth()), (int) (.4 * this.getHeight()));
         if(inBaseline){
-            g.drawString("Sum:", (int) (.25 * this.getWidth()), (int) (.4 * this.getHeight()));
-            //float sum = baseline.getSum();
-            g.drawString(baseline.getSum() + "", (int) (.25 * this.getWidth()), (int) (.4 * this.getHeight()) + 30);
-            g.drawString("Baseline:", (int) (.42 * this.getWidth()), (int) (.4 * this.getHeight()));
-            //float avg = baseline.getBaseline();
-            g.drawString(baseline.getBaseline() + "", (int) (.42 * this.getWidth()), (int) (.4 * this.getHeight()) + 30);
+            g.drawString("Baseline:", (int) (.28 * this.getWidth()), (int) (.4 * this.getHeight()));
+            g.drawString(baseline.getBaseline() + "", (int) (.28 * this.getWidth()), (int) (.4 * this.getHeight()) + 30);
         }
 
         LinkedList<DataPoint> top20 = new LinkedList<DataPoint>();
