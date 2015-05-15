@@ -33,7 +33,7 @@ public class NetworkThread extends Thread implements SerialPortEventListener{
 	private double starttime;
 	private double lastreceived; //Last time a message was received from the device.
 	private boolean timeout; //Whether or not the device has timed out. True if no message received in last 5 seconds.
-	private boolean randomon = true; //Whether or not random generation is turned on (used to test without arduino)
+	private boolean randomon = false; //Whether or not random generation is turned on (used to test without arduino)
 	private SerialPort serialPort;
 	private int foundcom; //0 if still initializing. -1 if com not found. 1 if com found.
 	private int attempts; //How many attempts the program will make in trying to find the comm port.
