@@ -422,7 +422,7 @@ public class Panel extends JPanel{
             g.setFont(new Font("Times New Roman", Font.PLAIN, largeTextSize));
             g.drawString("Loading" + loadDots, (int) (.25 * getWidth()), (int) (.4 * getHeight()));
             g.setFont(new Font("Times New Roman", Font.PLAIN, smallTextSize));
-            g.drawString("Make sure the Aduino is turned on.", (int) (.35 * getWidth()), (int) (.5 * getHeight()));
+            g.drawString("Make sure the Arduino is turned on.", (int) (.35 * getWidth()), (int) (.5 * getHeight()));
         }
         else if(foundCom < 0){ //failed to find Ardiuno
             g.setFont(new Font("Times New Roman", Font.BOLD, largeTextSize));
