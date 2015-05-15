@@ -40,6 +40,10 @@ public class Baselining {
     private double[] lowcount;
     private double[] mediumcount;
     private double[] highcount;
+    private boolean cancel;
+    private boolean ecancel;
+    private boolean bcancel;
+    private boolean lcancel;
     
 
 
@@ -60,6 +64,10 @@ public class Baselining {
         startBaseline = false;
         startLearning = false;
         startExtinction = false;
+        cancel = false;
+        ecancel = false;
+        bcancel = false;
+        lcancel = false;
         low = new double[3];
         high = new double[3];
         medium = new double[3];
@@ -315,7 +323,9 @@ public class Baselining {
     	if (!ispaused && startBaseline && ((System.currentTimeMillis() - startTime) < timeinphase)) {
     		updateSumMax(temporaryNewData);
     		baselineData.addAll(temporaryNewData);
-    		baseline = sum / (baselineData.size() - outliers);
+    		if (baselineData.size() - outliers != 0){
+    			baseline = sum / (baselineData.size() - outliers);
+    		}
     		timerem = (minutes - ((System.currentTimeMillis() - startTime) / 60000.0));}
     	else if (!ispaused && startBaseline){
     		startBaseline=false;
@@ -343,6 +353,48 @@ public class Baselining {
     		}
     		timerem = (minutes - ((System.currentTimeMillis() - startTime) / 60000.0));}
     	else if (!ispaused){startExtinction=false;}
+    	
+    	if (cancel){
+    		if (lcancel){
+    			learningData.clear();
+    	    	high[1] = 0;
+    	    	medium[1] = 0;
+    	    	low[1] = 0;
+    	    	highcount[0] = 0;
+    	    	mediumcount[0] = 0;
+    	    	lowcount[0] = 0;
+    	    	lcancel = false;
+    		}
+    		else if (bcancel){
+    	    	baselineData.clear();
+    	    	sum = 0;
+    	        baseline = 0;
+    	        timerem = 0;
+    	        outliers = 0;
+    	        high[0] = 0;
+    	        medium[0] = 0;
+    	        low[0] = 0;
+    			bcancel=false;
+    		}
+    		else if (ecancel){
+    			ecancel=false;
+    	    	extinctionData.clear();
+    	    	high[2] = 0;
+    	    	medium[2] = 0;
+    	    	low[2] = 0;
+    	    	highcount[1] = 0;
+    	    	mediumcount[1] = 0;
+    	    	lowcount[1] = 0;
+    		}
+    		ispaused = false;
+        	startBaseline = false;
+        	startLearning = false;
+        	startExtinction = false;
+        	cancel = false;
+    	}
+    	
+    	
+    	
     	}
 
     /**
@@ -363,57 +415,36 @@ public class Baselining {
      * Calls cancel() function and clears all collected data from learning phase.
      */
     public void learningCancel(){
+    	lcancel=true;
     	cancel();
-    	learningData.clear();
-    	high[1] = 0;
-    	medium[1] = 0;
-    	low[1] = 0;
-    	highcount[0] = 0;
-    	mediumcount[0] = 0;
-    	lowcount[0] = 0;
     }
     
     /**
      * Calls cancel() function and clears all collected data from baseline phase.
      */
     public void baselineCancel(){
+    	bcancel=true;
     	cancel();
-    	baselineData.clear();
-    	sum = 0;
-        baseline = 0;
-        timerem = 0;
-        outliers = 0;
-        high[0] = 0;
-        medium[0] = 0;
-        low[0] = 0;
     }
     
     /**
      * Calls cancel() function and clears all collected data from extinction phase.
      */
     public void extinctionCancel(){
+    	ecancel=true;
     	cancel();
-    	extinctionData.clear();
-    	high[2] = 0;
-    	medium[2] = 0;
-    	low[2] = 0;
-    	highcount[1] = 0;
-    	mediumcount[1] = 0;
-    	lowcount[1] = 0;
     }
     
     /**
      * Cancels the current phase execution and returns to the main screen.
      */
     private void cancel(){
-    	ispaused = false;
-    	startBaseline = false;
-    	startLearning = false;
-    	startExtinction = false;
+    	cancel = true;
     }
     
     public void extinctionPhase(double minutes){
     	 wristbandInterface.resetTime();
+    	 wristbandInterface.setThreshold(999);
          LinkedList<DataPoint> emptytrash = new LinkedList<DataPoint>();
          wristbandInterface.copyFromQueue(emptytrash);
          startExtinction = true;
