@@ -153,17 +153,17 @@ public class Summary extends JPanel {
 		g.drawString("Learning Phase", (int) (.02 * getWidth()),(int) (.6 * getHeight()));
 		g.drawString("Extinction Phase", (int)(.02*getWidth()),(int) (.75 * getHeight()));
 
-		g.drawString(baseline.getLowPercentages()[0]+"", (int) (.25 * getWidth()), (int) (.45 * getHeight()));
-		g.drawString(baseline.getMediumPercentages()[0] + "", (int) (.4 * getWidth()), (int) (.45 * getHeight()));
-		g.drawString(baseline.getHighPercentages()[0]+"", (int) (.6 * getWidth()), (int) (.45 * getHeight()));
+		g.drawString(baseline.getLowPercentages()[0]+"%", (int) (.25 * getWidth()), (int) (.45 * getHeight()));
+		g.drawString(baseline.getMediumPercentages()[0] + "%", (int) (.4 * getWidth()), (int) (.45 * getHeight()));
+		g.drawString(baseline.getHighPercentages()[0]+"%", (int) (.6 * getWidth()), (int) (.45 * getHeight()));
 
-		g.drawString(baseline.getLowPercentages()[1]+"", (int) (.25 * getWidth()), (int) (.6 * getHeight()));
-		g.drawString(baseline.getMediumPercentages()[1]+"", (int) (.4 * getWidth()), (int) (.6 * getHeight()));
-		g.drawString(baseline.getHighPercentages()[1]+"", (int) (.6 * getWidth()), (int) (.6 * getHeight()));
+		g.drawString(baseline.getLowPercentages()[1]+"%", (int) (.25 * getWidth()), (int) (.6 * getHeight()));
+		g.drawString(baseline.getMediumPercentages()[1]+"%", (int) (.4 * getWidth()), (int) (.6 * getHeight()));
+		g.drawString(baseline.getHighPercentages()[1]+"%", (int) (.6 * getWidth()), (int) (.6 * getHeight()));
 
-		g.drawString(baseline.getLowPercentages()[2]+"", (int) (.25 * getWidth()), (int) (.75 * getHeight()));
-		g.drawString(baseline.getMediumPercentages()[2]+"", (int) (.4 * getWidth()), (int) (.75 * getHeight()));
-		g.drawString(baseline.getHighPercentages()[2]+"", (int) (.6 * getWidth()), (int) (.75 * getHeight()));
+		g.drawString(baseline.getLowPercentages()[2]+"%", (int) (.25 * getWidth()), (int) (.75 * getHeight()));
+		g.drawString(baseline.getMediumPercentages()[2]+"%", (int) (.4 * getWidth()), (int) (.75 * getHeight()));
+		g.drawString(baseline.getHighPercentages()[2]+"%", (int) (.6 * getWidth()), (int) (.75 * getHeight()));
 
 		saveButton.setFont(new Font("Times New Roman", Font.PLAIN, buttonFontSize));
 		saveButton.setBounds((int) (this.getWidth() * .12), (int) (this.getHeight() * .05), (int) (this.getWidth() * .30), (int) (this.getHeight() * .15));

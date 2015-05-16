@@ -434,10 +434,10 @@ public class Panel extends JPanel{
         }
         else if(networkThread.getTimeOut()){
             g.setFont(new Font("Times New Roman", Font.BOLD, largeTextSize));
-            g.drawString("The connection with the Arduino was lost.", (int) (.15 * getWidth()), (int) (.4 * getHeight()));
+            g.drawString("The connection with the Arduino was lost.", (int) (.15 * getWidth()), (int) (.5 * getHeight()));
             g.setFont(new Font("Times New Roman", Font.PLAIN, smallTextSize));
-            g.drawString("Please make sure the Arduino is connected and retry", (int) (.16 * getWidth()), (int) (.48 * getHeight()));
-            arduinoTimeOut.setBounds((int) (.25 * getWidth()), (int) (.55 * getHeight()), (int) (.35 * getWidth()), (int) (.13 * getHeight()));
+            g.drawString("Please make sure the Arduino is connected and retry", (int) (.16 * getWidth()), (int) (.58 * getHeight()));
+            arduinoTimeOut.setBounds((int) (.25 * getWidth()), (int) (.65 * getHeight()), (int) (.35 * getWidth()), (int) (.13 * getHeight()));
             arduinoTimeOut.setVisible(true);
         }
         else if(inBaseline){ //in baseline phase, collecting data
@@ -528,13 +528,13 @@ public class Panel extends JPanel{
         }
 
         g.drawString("Low:", (int) (.48 * this.getWidth()), (int) (.4 * this.getHeight()));
-        g.drawString(baseline.getLowPercentages()[k] + "", (int) (.48 * this.getWidth()), (int) (.4 * this.getHeight()) + 30);
+        g.drawString(baseline.getLowPercentages()[k] + "%", (int) (.48 * this.getWidth()), (int) (.4 * this.getHeight()) + 30);
 
         g.drawString("Medium:", (int) (.63 * this.getWidth()), (int) (.4 * this.getHeight()));
-        g.drawString(baseline.getMediumPercentages()[k] + "", (int) (.63 * this.getWidth()), (int) (.4 * this.getHeight()) + 30);
+        g.drawString(baseline.getMediumPercentages()[k] + "%", (int) (.63 * this.getWidth()), (int) (.4 * this.getHeight()) + 30);
 
         g.drawString("High:", (int) (.78 * this.getWidth()), (int) (.4 * this.getHeight()));
-        g.drawString(baseline.getHighPercentages()[k] + "", (int) (.78 * this.getWidth()), (int) (.4 * this.getHeight()) + 30);
+        g.drawString(baseline.getHighPercentages()[k] + "%", (int) (.78 * this.getWidth()), (int) (.4 * this.getHeight()) + 30);
 
         g.setFont(new Font("Courier New", Font.PLAIN, dataTextSize));
         LinkedList<DataPoint> top20 = new LinkedList<DataPoint>();
