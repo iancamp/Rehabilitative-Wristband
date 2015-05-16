@@ -4,6 +4,7 @@ import javax.swing.*;
 
 import java.awt.*;
 import java.awt.event.*;
+import java.io.File;
 import java.io.IOException;
 
 /**
@@ -52,30 +53,40 @@ public class Summary extends JPanel {
 								null,
 						"ID");
 				if(id != null){ //if an id was entered and cancel was not selected
+					if (!os.contains("mac os x")){
+						//show save dialog box
+						JFileChooser j = new JFileChooser();
+						j.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+						Integer opt = j.showOpenDialog(getFrame());
 
-					//show save dialog box
-					JFileChooser j = new JFileChooser();
-					j.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-					Integer opt = j.showSaveDialog(getFrame());
 
 
-					if(opt == j.APPROVE_OPTION){ //if the save dialog "OK" button was pressed
-						try {
-							path = j.getSelectedFile().getCanonicalPath(); //get the file path (does not include trailing "/"
-						} catch (IOException e) {
-							e.printStackTrace();
+						if(opt == j.APPROVE_OPTION){ //if the save dialog "OK" button was pressed
+							try {
+								path = j.getSelectedFile().getCanonicalPath(); //get the file path (does not include trailing "/"
+								System.out.println(path);
+							} catch (IOException e) {
+								e.printStackTrace();
+							}
+
+							//check for OS so the correct / format can be appended to the path
+							if(os.contains("linux"))
+								path += "/";
+							else if(os.contains("windows"))
+								path += "\\";
+							//System.out.println(path);
 						}
 
-						//check for OS so the correct / format can be appended to the path
-						if(os.contains("mac os x") || os.contains("linux"))
-							path += "/";
-						else if(os.contains("windows"))
-							path += "\\";
-						//System.out.println(path);
-
-						FileManager.saveToCSV(getBaseline(), id,path);
 					}
-
+					else{
+						JFrame frame = new JFrame();
+					    System.setProperty("apple.awt.fileDialogForDirectories", "true");
+					    FileDialog dialog = new FileDialog(frame);
+					    dialog.setVisible(true);
+					    path = dialog.getDirectory() + dialog.getFile() + "/";
+					    
+					}
+					FileManager.saveToCSV(getBaseline(), id,path);
 				}
 			}
 		});
