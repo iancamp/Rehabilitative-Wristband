@@ -1,0 +1,32 @@
+#!/bin/bash
+#Script derived from Jani Hartikainen (http://codeutopia.net/blog/2011/06/30/how-to-automatically-run-unit-tests-from-a-git-push/)
+while read oldrev newrev refname
+do
+    if [[ $refname = "refs/heads/master" ]] ; then
+        #Delete any temp files from old commits
+        rm -rf /home/shared/tmp/*
+
+        echo "----------------------------------------" | ts >> /home/shared/log/pre-receive_git-hook.log
+        echo "----------------------------------------" | ts >> /home/shared/log/pre-receive_git-hook.log
+
+        echo "Generating Javadoc for $newrev..."
+        echo "Generating Javadoc for $newrev..." | ts >> /home/shared/log/pre-receive_git-hook.log
+
+        #Since repo is bare, put files in temporary directory
+        git archive $newrev | tar -x -C /home/shared/tmp/
+        
+        cd  /home/shared/tmp
+        
+        #generate javadoc
+        ant -buildfile javadoc.xml | ts >> /home/shared/log/pre-receive_git-hook.log
+        
+        #copy new javadoc to trac htdocs directory, overwriting if necessary
+        \cp -Rf doc/* /home/shared/trac/htdocs/javadoc | ts >> /home/shared/log/pre-receive_git-hook.log
+        
+        echo "Javadoc created!"
+        echo "Javadoc created!" | ts >> /home/shared/log/pre-receive_git-hook.log
+        
+    fi
+done
+        
+exit 0
