@@ -1,3 +1,10 @@
+Project lead: Michele Lobo (https://www.udel.edu/chs/facultystaff/lobo.html).
+
+Short description:
+A project we did for our Advanced Software Engineering class at the University of Delaware. The purpose of the project is to analyze baby movement using an arduino and client side. Once data is analyzed, a learning phase is entered where a small toy is moved when the baby surpasses the previously set movement threshold.
+
+
+
 ---------------------------------------------------------------------------------------------------------------------------------------
 REQUIRED LIBRARIES
 ---------------------------------------------------------------------------------------------------------------------------------------
